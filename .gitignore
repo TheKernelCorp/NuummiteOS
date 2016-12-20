@@ -1,0 +1,4 @@
+*.iso
+isodir
+sysroot
+.vscode
