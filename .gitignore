@@ -1,5 +1,9 @@
+# Build artifacts
+*.o
 *.iso
+*.kern
 isodir
 sysroot
+
+# VSCode stuff
 .vscode
-*.o
