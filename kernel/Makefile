@@ -16,12 +16,15 @@ OBJS:=\
 $(ARCH_OBJS) \
 src/kernel.o
 
+ALL_OBJS:=\
+$(OBJS)
+
 OBJ_LINK:=\
 $(OBJS)
 
 all: nuummite.kern
 
-.PHONY: all nuummite.kern install install-kern
+.PHONY: all nuummite.kern install install-kern clean
 
 nuummite.kern: $(OBJ_LINK) $(ARCHDIR)/linker.ld
 	$(LD) -T $(ARCHDIR)/linker.ld -o $@ $(OBJ_LINK) $(LDFLAGS)
@@ -37,3 +40,6 @@ install: install-kern
 install-kern: nuummite.kern
 	mkdir -p $(DESTDIR)$(BOOTDIR)
 	cp nuummite.kern $(DESTDIR)$(BOOTDIR)
+
+clean:
+	rm -rf nuummite.kern $(OBJS) $(ALL_OBJS) *.o

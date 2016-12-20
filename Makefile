@@ -23,7 +23,7 @@ PROJECTS:=$(SYSTEM_PROJECTS)
 
 export DESTDIR:=$(PWD)/sysroot
 
-.PHONY: all iso sysroot projects qemu qemu-curses
+.PHONY: all iso sysroot projects qemu qemu-curses clean
 
 all: iso
 
@@ -47,3 +47,11 @@ qemu: all
 
 qemu-curses: all
 	qemu-system-$(ARCH) -cdrom nuummiteos.iso -curses
+
+clean:
+	for PROJECT in $(PROJECTS); do \
+		make -s -C $$PROJECT clean; \
+	done
+	rm -rf sysroot
+	rm -rf isodir
+	rm -rf nuummite.iso
