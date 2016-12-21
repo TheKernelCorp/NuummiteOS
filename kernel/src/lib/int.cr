@@ -1,6 +1,7 @@
 struct Int
     def <<(count) unsafe_shl count end
     def >>(count) unsafe_shr count end
+    def ===(other : Int) self == other end
     def /(other : Int)
         if other == 0
             self
