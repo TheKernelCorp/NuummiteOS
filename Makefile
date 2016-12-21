@@ -48,6 +48,8 @@ qemu: all
 qemu-curses: all
 	qemu-system-$(ARCH) -cdrom nuummiteos.iso -curses
 
+check: projects clean
+
 clean:
 	for PROJECT in $(PROJECTS); do \
 		make -s -C $$PROJECT clean; \
