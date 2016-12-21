@@ -26,14 +26,6 @@ lib LibMultiboot
     MULTIBOOT_FRAMEBUFFER_TYPE_RGB      = 0x00000001
     MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT = 0x00000002
 
-    struct MultibootHeader
-        magic : UInt32
-        flags : UInt32
-        checksum : UInt32
-        aout_info : AoutInfo
-        video_info : VideoInfo
-    end
-
     struct AoutInfo
         header_addr : UInt32
         load_addr : UInt32
@@ -47,6 +39,14 @@ lib LibMultiboot
         width : UInt32
         height : UInt32
         depth : UInt32
+    end
+
+    struct MultibootHeader
+        magic : UInt32
+        flags : UInt32
+        checksum : UInt32
+        aout_info : AoutInfo
+        video_info : VideoInfo
     end
 
     struct AoutSymbolTable
@@ -66,13 +66,6 @@ lib LibMultiboot
     union SymbolTable
         aout_sym : AoutSymbolTable
         elf_sec : ElfSectionHeaderTable
-    end
-
-    struct BootDevice
-        drive : UInt8
-        partition_1 : UInt8
-        partition_2 : UInt8
-        partition_3 : UInt8
     end
 
     struct FramebufferPaletteInfo
@@ -114,6 +107,13 @@ lib LibMultiboot
         vbe_interface_off : UInt16
         vbe_interface_len : UInt16
         vbe_framebuffer_info : FramebufferInfo
+    end
+
+    struct BootDevice
+        drive : UInt8
+        partition_1 : UInt8
+        partition_2 : UInt8
+        partition_3 : UInt8
     end
 
     struct MultibootInfo
