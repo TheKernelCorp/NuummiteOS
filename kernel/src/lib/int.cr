@@ -8,6 +8,12 @@ struct Int
         end
         unsafe_div other
     end
+    def %(other : Int)
+        if other  == 0
+            self
+        end
+        unsafe_mod other
+    end
     def times
         i = 0
         while i < self
