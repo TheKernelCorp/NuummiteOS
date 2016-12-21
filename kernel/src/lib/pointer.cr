@@ -3,7 +3,7 @@ struct Pointer(T)
     self + other.to_i64
   end
 
-  def []=(offset, value)
+  def []=(offset : Int, value : T)
     (self + offset).value = value
   end
 end
