@@ -1,3 +1,5 @@
+require "./lib/pointer.cr"
+
 lib LibMultiboot
     MULTIBOOT_SEARCH                    = 0x00002000
     MULTIBOOT_HEADER_ALIGN              = 0x00000004

@@ -8,9 +8,9 @@ CHECKSUM  equ -(MAGIC + FLAGS)
 ; Multiboot header
 section .multiboot
 align 4
-  dd MAGIC
-  dd FLAGS
-  dd CHECKSUM
+    dd MAGIC
+    dd FLAGS
+    dd CHECKSUM
 
 section .bss
 align 4096
@@ -34,8 +34,9 @@ extern kmain
 ; This is where GRUB takes us.
 ;
 _start:
-  cli
-  mov esp, stack.top
+    cli
+    mov esp, stack.top
+    push ebx
 
 ;
 ; Paging magic.
@@ -107,7 +108,7 @@ enable_sse:
 ; Jumps into the Crystal kernel.
 ;
 enter_kernel:
-  call kmain
+    call kmain
 .hang:
-  cli
-  jmp $
+    cli
+    jmp $
