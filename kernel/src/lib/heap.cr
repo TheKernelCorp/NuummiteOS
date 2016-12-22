@@ -50,10 +50,9 @@ struct Heap
     def calloc(size : USize) : Pointer(UInt8)
         block = alloc size
         return Pointer(UInt8).null unless block
-        chunk = block.value.block_chunk.as? Void*
-        return Pointer(UInt8).null unless chunk
+        chunk = block.value.block_chunk.as Pointer(Void)
         memset chunk, 0_u8, size
-        chunk.as Pointer(UInt8)
+        block.value.block_chunk
     end
 
     def kalloc(size : USize) : Pointer(UInt8)
@@ -64,7 +63,7 @@ struct Heap
 
     private def alloc(size : USize) : Pointer(Block) | Nil
         new_block = get_or_alloc_block size
-        return if new_block.is_a? Nil
+        return unless new_block
         new_block.value.block_next = @used_top
         @used_top = new_block
         new_block
