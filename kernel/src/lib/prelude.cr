@@ -21,6 +21,7 @@ require "./heap"
 require "./int"
 # j
 # k
+require "./kspec"
 # l
 # m
 require "./memory"
@@ -36,7 +37,6 @@ require "./raise"
 # s
 # t
 require "./terminal"
-require "./tests"
 require "./types"
 # u
 # v
