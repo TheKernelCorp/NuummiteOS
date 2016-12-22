@@ -1,6 +1,3 @@
-require "./pointer"
-require "./int"
-
 private TERMINAL = Terminal.new
 
 def print(str : String)

@@ -1,5 +1,3 @@
-require "./terminal"
-
 def panic(file = __FILE__, line = __LINE__) : NoReturn
     puts "*** KERNEL PANIC"
     print "*** File: "

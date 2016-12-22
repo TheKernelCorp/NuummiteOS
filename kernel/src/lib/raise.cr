@@ -1,5 +1,3 @@
-require "./panic"
-
 fun __crystal_personality : NoReturn
     panic
 end

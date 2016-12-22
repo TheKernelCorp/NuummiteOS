@@ -1,5 +1,3 @@
-require "./pointer"
-
 alias MultibootPointer = Pointer(LibMultiboot::MultibootInfo)
 
 struct MultibootHelper

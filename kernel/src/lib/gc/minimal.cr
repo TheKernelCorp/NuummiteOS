@@ -1,9 +1,6 @@
 # Skeleton:
 # https://github.com/crystal-lang/crystal/blob/master/src/gc/null.cr
 
-require "../heap"
-require "../panic"
-
 fun __crystal_malloc(size : UInt32) : Void*
     block = Heap.kalloc(size).as Void*
     panic if block.null?

@@ -1,5 +1,3 @@
-require "./types"
-
 fun memcpy(dst : Void*, src : Void*, n : USize) : Void*
     dst_sig = dst
     dst = dst.to_byte_ptr

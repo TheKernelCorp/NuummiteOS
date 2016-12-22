@@ -1,7 +1,3 @@
-require "./int"
-require "./types"
-require "./pointer"
-
 private ALIGN = 8_u32
 private GUARD1 = 0x4E69636F_u32
 private GUARD2 = 0x42697574_u32
