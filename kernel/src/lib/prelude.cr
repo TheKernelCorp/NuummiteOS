@@ -8,6 +8,7 @@ require "./string"
 # a
 # b
 # c
+require "./class"
 # d
 # e
 # f
