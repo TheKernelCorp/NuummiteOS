@@ -17,7 +17,7 @@ macro assert(a)
 end
 
 macro assert_eq(a, b)
-    __test_fail unless {{a}} != {{b}}
+    __test_fail unless {{a}} == {{b}}
 end
 
 macro __test_fail
