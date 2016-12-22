@@ -1,4 +1,7 @@
 struct Pointer(T)
+  def self.null
+    new(0_u64)
+  end
   def +(other : Int)
     self + other.to_i64
   end
@@ -23,11 +26,8 @@ struct Pointer(T)
   def []=(offset : Int, value : T)
     (self + offset).value = value
   end
-  def unwrap : T
-    self[0]
-  end
   def null?
-    self == 0_u64
+    address == 0
   end
   def to_byte_ptr
     self.as(Pointer(UInt8))
