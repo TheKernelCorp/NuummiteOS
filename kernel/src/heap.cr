@@ -28,11 +28,27 @@ private lib LibHeap
 end
 
 struct Heap
+    @@instance : Heap?
+
+    def self.init(end_of_kernel : USize)
+        @@instance = Heap.new end_of_kernel
+    end
+
     def initialize(end_of_kernel : USize)
         addr = Pointer(UInt8).new align(end_of_kernel).to_u64
         @used_top = Pointer(Block).null
         @free_top = Pointer(Block).null
         @free_addr = addr.as Pointer(UInt8)
+    end
+
+    def self.calloc(size : USize) : Pointer(UInt8) | Nil
+        return if @@instance.nil?
+        @@instance.calloc size
+    end
+
+    def self.kalloc(size : USize) : Pointer(UInt8) | Nil
+        return if @@instance.nil?
+        @@instance.kalloc size
     end
 
     def calloc(size : USize) : Pointer(UInt8) | Nil
