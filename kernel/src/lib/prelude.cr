@@ -31,6 +31,7 @@ require "./multiboot"
 # p
 require "./panic"
 require "./pointer"
+require "./portio"
 # q
 # r
 require "./raise"
