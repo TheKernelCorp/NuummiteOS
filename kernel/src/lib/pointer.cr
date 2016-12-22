@@ -5,6 +5,12 @@ struct Pointer(T)
   def -(other : Int)
     self - other.to_i64
   end
+  def <(other : Pointer(_))
+    self < other
+  end
+  def >(other : Pointer(_))
+    self > other
+  end
   def ==(other : Int)
     self == other.to_i64
   end
@@ -22,5 +28,8 @@ struct Pointer(T)
   end
   def null?
     self == 0_u64
+  end
+  def to_byte_ptr
+    self.as(Pointer(UInt8))
   end
 end
