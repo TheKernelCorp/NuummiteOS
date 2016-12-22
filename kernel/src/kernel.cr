@@ -1,6 +1,6 @@
+require "./heap.cr"
 require "./terminal.cr"
 require "./multiboot.cr"
-require "./heap.cr"
 
 fun kmain(mboot_ptr : MultibootPointer)
     mboot = MultibootHelper.load mboot_ptr
