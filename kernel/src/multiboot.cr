@@ -7,11 +7,10 @@ struct MultibootHelper
         MultibootHelper.new ptr
     end
     def initialize(@ptr : MultibootPointer)
-        @mboot_info = @ptr.unwrap.as(LibMultiboot::MultibootInfo)
+        @mboot_info = @ptr.value.as LibMultiboot::MultibootInfo
     end
     def end_of_kernel
-        elf = @mboot_info.symbols.elf_sec
-        (elf.addr + elf.size).to_u32
+        elf = @mboot_info.mods_addr + 4
     end
 end
 
