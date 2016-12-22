@@ -1,5 +1,20 @@
 require "./lib/pointer.cr"
 
+alias MultibootPointer = Pointer(LibMultiboot::MultibootInfo)
+
+struct MultibootHelper
+    def self.load(ptr : MultibootPointer)
+        MultibootHelper.new ptr
+    end
+    def initialize(@ptr : MultibootPointer)
+        @mboot_info = @ptr.unwrap.as(LibMultiboot::MultibootInfo)
+    end
+    def end_of_kernel
+        elf = @mboot_info.symbols.elf_sec
+        (elf.addr + elf.size).to_u32
+    end
+end
+
 lib LibMultiboot
     MULTIBOOT_SEARCH                    = 0x00002000
     MULTIBOOT_HEADER_ALIGN              = 0x00000004
@@ -126,7 +141,7 @@ lib LibMultiboot
         cmdline : UInt32
         mods_count : UInt32
         mods_addr : UInt32
-        elf_symbols : SymbolTable
+        symbols : SymbolTable
         mmap_length : UInt32
         mmap_addr : UInt32
         config_table : UInt32

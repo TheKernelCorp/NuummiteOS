@@ -3,12 +3,29 @@ require "./lib/int.cr"
 
 private TERMINAL = Terminal.new
 
-def print(str)
+def print(str : String)
     TERMINAL.write str
 end
 
-def puts(str)
-    print str
+#def print(val : Int)
+#    base = '0'.ord
+#    if val < 0
+#        val = 0 - val
+#        TERMINAL.write_byte '-'.ord.to_u8
+#    end
+#    accum = 0
+#    while true
+#        accum += 1
+#        break if (val /= 10) == 0
+#    end
+#    accum.times do |i|
+#        b = uninitialized UInt8
+#        TERMINAL.write_byte b
+#    end
+#end
+
+def puts(val)
+    print val
     TERMINAL.newline
 end
 
