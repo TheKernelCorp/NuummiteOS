@@ -1,6 +1,6 @@
-require "./types.cr"
+require "./types"
 
-def memcpy(dst : Pointer(_), src : Pointer(_), n : USize) : Pointer
+fun memcpy(dst : Void*, src : Void*, n : USize) : Void*
     dst_sig = dst
     dst = dst.to_byte_ptr
     src = src.to_byte_ptr
@@ -12,7 +12,7 @@ def memcpy(dst : Pointer(_), src : Pointer(_), n : USize) : Pointer
     dst_sig
 end
 
-def memmove(dst : Pointer(_), src : Pointer(_), n : USize) : Pointer
+fun memmove(dst : Void*, src : Void*, n : USize) : Void*
     dst_sig = dst
     dst = dst.to_byte_ptr
     src = src.to_byte_ptr
@@ -32,7 +32,7 @@ def memmove(dst : Pointer(_), src : Pointer(_), n : USize) : Pointer
     dst_sig
 end
 
-def memset(dst : Pointer(_), c : UInt8, n : USize) : Pointer
+fun memset(dst : Void*, c : UInt8, n : USize) : Void*
     ptr = dst.to_byte_ptr
     i = 0
     while i < n
@@ -41,7 +41,7 @@ def memset(dst : Pointer(_), c : UInt8, n : USize) : Pointer
     dst
 end
 
-def memcmp(ptr_a : Pointer(_), ptr_b : Pointer(_), n : USize)
+fun memcmp(ptr_a : Void*, ptr_b : Void*, n : USize)
     ptr_a = ptr_a.to_byte_ptr
     ptr_b = ptr_b.to_byte_ptr
     i = 0

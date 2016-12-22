@@ -1,6 +1,6 @@
-require "./lib/int.cr"
-require "./lib/types.cr"
-require "./lib/pointer.cr"
+require "./int"
+require "./types"
+require "./pointer"
 
 private ALIGN = 8_u32
 private GUARD1 = 0x4E69636F_u32
@@ -9,13 +9,11 @@ private GUARD2 = 0x42697574_u32
 private alias Block = LibHeap::Block
 
 struct HeapAllocator(T)
-    def self.calloc(heap : Heap) : Pointer(T) | Nil
-        data = heap.calloc sizeof(T).to_u32
-        return data.as Pointer(T) if !data.is_a? Nil
+    def self.calloc : Pointer(T)
+        Heap.calloc(sizeof(T).to_u32).as Pointer(T)
     end
-    def self.kalloc(heap : Heap) : Pointer(T) | Nil
-        data = heap.kalloc sizeof(T).to_u32
-        return data.as Pointer(T) if !data.is_a? Nil
+    def self.kalloc : Pointer(T)
+        Heap.kalloc(sizeof(T).to_u32).as Pointer(T)
     end
 end
 
@@ -41,27 +39,31 @@ struct Heap
         @free_addr = addr.as Pointer(UInt8)
     end
 
-    def self.calloc(size : USize) : Pointer(UInt8) | Nil
-        return if @@instance.nil?
-        @@instance.calloc size
+    def self.calloc(size : USize) : Pointer(UInt8)
+        instance = @@instance
+        return Pointer(UInt8).null unless instance
+        instance.calloc size
     end
 
-    def self.kalloc(size : USize) : Pointer(UInt8) | Nil
-        return if @@instance.nil?
-        @@instance.kalloc size
+    def self.kalloc(size : USize) : Pointer(UInt8)
+        instance = @@instance
+        return Pointer(UInt8).null unless instance
+        instance.kalloc size
     end
 
-    def calloc(size : USize) : Pointer(UInt8) | Nil
+    def calloc(size : USize) : Pointer(UInt8)
         block = alloc size
-        return if block.is_a? Nil
-        memset block.value.block_chunk, 0_u8, size
-        block.value.block_chunk.as Pointer(UInt8)
+        return Pointer(UInt8).null unless block
+        chunk = block.value.block_chunk.as? Void*
+        return Pointer(UInt8).null unless chunk
+        memset chunk, 0_u8, size
+        chunk.as Pointer(UInt8)
     end
 
-    def kalloc(size : USize) : Pointer(UInt8) | Nil
+    def kalloc(size : USize) : Pointer(UInt8)
         block = alloc size
-        return if block.is_a? Nil
-        block.value.block_chunk.as Pointer(UInt8)
+        return Pointer(UInt8).null unless block
+        block.value.block_chunk
     end
 
     private def alloc(size : USize) : Pointer(Block) | Nil
@@ -76,7 +78,7 @@ struct Heap
         block = get_block size
         if get_block(size).is_a? Nil
             block = alloc_block(sizeof(Block).to_u32).as Pointer(Block)
-            return if block.is_a? Nil
+            return unless block
             block.value.block_size = size
             block.value.block_chunk = alloc_block size
         end

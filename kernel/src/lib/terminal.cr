@@ -1,5 +1,5 @@
-require "./lib/pointer.cr"
-require "./lib/int.cr"
+require "./pointer"
+require "./int"
 
 private TERMINAL = Terminal.new
 

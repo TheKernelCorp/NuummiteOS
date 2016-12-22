@@ -1,4 +1,4 @@
-require "./lib/pointer.cr"
+require "./pointer"
 
 alias MultibootPointer = Pointer(LibMultiboot::MultibootInfo)
 
