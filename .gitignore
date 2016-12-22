@@ -4,6 +4,7 @@
 *.kern
 isodir
 sysroot
+bc_flags
 
 # VSCode stuff
 .vscode
