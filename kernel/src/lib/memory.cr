@@ -35,6 +35,7 @@ fun memset(dst : Void*, c : UInt8, n : USize) : Void*
     i = 0
     while i < n
         ptr[i] = c
+        i += 1
     end
     dst
 end
