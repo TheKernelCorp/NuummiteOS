@@ -1,9 +1,12 @@
 require "./lib/prelude"
 
-fun kmain(mboot_ptr : MultibootPointer)
+fun kearly(mboot_ptr : MultibootPointer)
     Heap.init MultibootHelper.load(mboot_ptr).end_of_kernel
-    puts "Hello from Nuummite!"
     run_self_tests
+end
+
+fun kmain
+    puts "Hello from Nuummite!"
 end
 
 def run_self_tests

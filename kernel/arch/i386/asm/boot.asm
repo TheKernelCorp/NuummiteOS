@@ -28,6 +28,7 @@ resb 16384 ; 16 KiB
 
 section .text
 global _start
+extern kearly
 extern kmain
 
 ;
@@ -42,6 +43,7 @@ _start:
 ; Jumps into the Crystal kernel.
 ;
 enter_kernel:
+    call kearly
     call kmain
 .hang:
     cli
