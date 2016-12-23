@@ -22,12 +22,12 @@ end
 module Tests
     test heap_calloc, "Heap#calloc", begin
         ptr = HeapAllocator(UInt64).calloc
-        assert !ptr.null?
+        assert_not ptr.null?
         assert_eq ptr.value, 0_u64
     end
 
     test heap_kalloc, "Heap#kalloc", begin
         ptr = HeapAllocator(UInt64).kalloc
-        assert !ptr.null?
+        assert_not ptr.null?
     end
 end

@@ -13,11 +13,19 @@ macro test(name, description, content)
 end
 
 macro assert(a)
-    __test_fail unless {{a}}
+    __test_fail unless {{ a }}
+end
+
+macro assert_not(a)
+    __test_fail if {{ a }}
 end
 
 macro assert_eq(a, b)
-    __test_fail unless {{a}} == {{b}}
+    __test_fail unless {{ a }} == {{ b }}
+end
+
+macro assert_not_eq(a, b)
+    __test_fail if {{ a }} == {{ b }}
 end
 
 macro __test_fail
