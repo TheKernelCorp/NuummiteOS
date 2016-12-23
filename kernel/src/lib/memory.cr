@@ -40,7 +40,7 @@ fun memset(dst : Void*, c : UInt8, n : USize) : Void*
   dst
 end
 
-fun memcmp(ptr_a : Void*, ptr_b : Void*, n : USize)
+fun memcmp(ptr_a : Void*, ptr_b : Void*, n : USize) : Int32
   ptr_a = ptr_a.to_byte_ptr
   ptr_b = ptr_b.to_byte_ptr
   i = 0
