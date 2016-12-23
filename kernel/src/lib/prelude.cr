@@ -36,12 +36,14 @@ require "./portio"
 # r
 require "./raise"
 # s
+require "./serial"
 # t
 require "./terminal"
 require "./types"
 # u
 # v
 # w
+require "./write"
 # x
 # y
 # z
