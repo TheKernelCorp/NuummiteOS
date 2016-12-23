@@ -7,6 +7,7 @@ end
 
 fun kmain
     puts "Hello from Nuummite!"
+    writeln Serial0, "Hello, world!"
 end
 
 def run_self_tests

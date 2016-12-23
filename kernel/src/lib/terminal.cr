@@ -1,7 +1,7 @@
-private TERMINAL = Terminal.new
+Terminal = TerminalDevice.new
 
 def print(str : String)
-    TERMINAL.write str
+    Terminal.write str
 end
 
 #def print(val : Int)
@@ -23,10 +23,10 @@ end
 
 def puts(val)
     print val
-    TERMINAL.newline
+    Terminal.newline
 end
 
-private struct Terminal
+private struct TerminalDevice
 
     # Constants
     private TAB_SIZE    = 4
@@ -90,7 +90,7 @@ private struct Terminal
     # Clears the screen.
     def clear
         attr = TerminalHelper.make_attribute BLANK, @color
-        VGA_SIZE.times { |i| @vmem[i] = attr}
+        VGA_SIZE.times { |i| @vmem[i] = attr }
     end
 
     # Scrolls the terminal.
