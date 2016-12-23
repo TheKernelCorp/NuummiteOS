@@ -35,6 +35,7 @@ require "./portio"
 # q
 # r
 require "./raise"
+require "./reference"
 # s
 require "./serial"
 # t
