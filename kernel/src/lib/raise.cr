@@ -1,20 +1,20 @@
 fun __crystal_personality : NoReturn
-    panic
+  panic
 end
 
 @[Raises]
 fun __crystal_raise : NoReturn
-    panic
+  panic
 end
 
 fun __crystal_raise_string : NoReturn
-    panic
+  panic
 end
 
 def raise(file = __FILE__) : NoReturn
-    panic file
+  panic file
 end
 
 def raise(ex : Exception, file = __FILE__) : NoReturn
-    panic file
+  panic file
 end
