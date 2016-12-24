@@ -1,6 +1,6 @@
 struct Pointer(T)
   def self.null
-    new(0_u64)
+    new 0_u64
   end
 
   def +(other : Int)
@@ -8,23 +8,26 @@ struct Pointer(T)
   end
 
   def -(other : Int)
+    if other > address
+      raise
+    end
     self - other.to_i64
   end
 
   def <(other : Pointer(_))
-    self < other
+    self.address < other.address
   end
 
   def >(other : Pointer(_))
-    self > other
+    self.address > other.address
   end
 
   def ==(other : Int)
-    self == other.to_i64
+    address == other.to_i64
   end
 
   def ==(other : Pointer(_))
-    self == other
+    self.address == other.address
   end
 
   def [](offset : Int) : T
@@ -40,6 +43,6 @@ struct Pointer(T)
   end
 
   def to_byte_ptr
-    self.as(Pointer(UInt8))
+    self.as UInt8*
   end
 end
