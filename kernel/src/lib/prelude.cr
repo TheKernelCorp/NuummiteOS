@@ -28,7 +28,10 @@ require "./int"
 require "./memory"
 require "./multiboot"
 # n
+require "./named_tuple"
+require "./nil"
 # o
+require "./object"
 # p
 require "./panic"
 require "./pointer"
@@ -42,6 +45,7 @@ require "./serial"
 require "./string"
 # t
 require "./terminal"
+require "./tuple"
 require "./types"
 # u
 # v
