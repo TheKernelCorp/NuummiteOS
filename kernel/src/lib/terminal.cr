@@ -4,22 +4,18 @@ def print(str : String)
   Terminal.write str
 end
 
-# def print(val : Int)
-#    base = '0'.ord
-#    if val < 0
-#        val = 0 - val
-#        TERMINAL.write_byte '-'.ord.to_u8
-#    end
-#    accum = 0
-#    while true
-#        accum += 1
-#        break if (val /= 10) == 0
-#    end
-#    accum.times do |i|
-#        b = uninitialized UInt8
-#        TERMINAL.write_byte b
-#    end
-# end
+def print(val : Int)
+  base = '0'.ord.to_u8
+  if val < 0
+    val = 0 - val
+    Terminal.write_byte '-'.ord.to_u8
+  end
+  while true
+    Terminal.write_byte (val.to_i % 10).to_u8 + base
+    val = val.to_i / 10
+    break if val == 0
+  end
+end
 
 def puts(val)
   print val
