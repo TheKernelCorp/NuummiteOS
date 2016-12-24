@@ -1,7 +1,14 @@
 require "./lib/prelude"
 
+lib LibBootstrap
+  $end_of_kernel = END_OF_KERNEL : UInt32
+end
+
 fun kearly(mboot_ptr : MultibootPointer)
-  Heap.init MultibootHelper.load(mboot_ptr).end_of_kernel
+  sym = LibBootstrap.end_of_kernel
+  end_of_kernel = pointerof(sym)
+  puts end_of_kernel.address
+  Heap.init end_of_kernel.address.to_u32
   run_self_tests
 end
 
