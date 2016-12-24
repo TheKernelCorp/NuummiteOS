@@ -23,7 +23,7 @@ PROJECTS:=$(SYSTEM_PROJECTS)
 
 export DESTDIR:=$(PWD)/sysroot
 
-.PHONY: all iso sysroot projects qemu qemu-curses check clean
+.PHONY: all iso sysroot projects qemu qemu-curses qemu-curses-halt check clean
 
 all: iso
 
@@ -47,6 +47,9 @@ qemu: all
 
 qemu-curses: all
 	qemu-system-$(ARCH) -cdrom nuummiteos.iso -curses
+
+qemu-curses-halt: all
+	qemu-system-$(ARCH) -cdrom nuummiteos.iso -curses -no-reboot -no-shutdown
 
 check: projects clean
 

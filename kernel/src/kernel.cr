@@ -10,9 +10,10 @@ fun kearly(mboot_ptr : MultibootPointer)
   end_of_kernel = pointerof(sym)
   puts end_of_kernel.address
   Heap.init end_of_kernel.address.to_u32
+end
 
 fun kearly(mboot_ptr : MultibootPointer)
-  Heap.init MultibootHelper.load(mboot_ptr).end_of_kernel
+  Heap.init 10_000_000u32
   DeviceManager.init
   run_self_tests
 end
@@ -27,6 +28,7 @@ def run_self_tests
   run_tests Tests, [
     heap_calloc,
     heap_kalloc,
+    heap_kalloc_diff,
     dev_serial,
   ]
   puts "FYI the kernel is still running."
@@ -42,6 +44,15 @@ module Tests
   test heap_kalloc, "Heap#kalloc", begin
     ptr = HeapAllocator(UInt64).kalloc
     assert_not ptr.null?
+  end
+
+  test heap_kalloc_diff, "Heap#kalloc_diff", begin
+    ptr = HeapAllocator(UInt64).kalloc
+    old = Heap.addr
+    ptr2 = HeapAllocator(UInt64).kalloc
+    new = Heap.addr
+    assert_not_eq old, new
+    assert_not ptr.address == ptr2.address
   end
 
   test dev_serial, "Device#serial", begin

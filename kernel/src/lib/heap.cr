@@ -23,10 +23,11 @@ private lib LibHeap
 end
 
 struct Heap
-  @@instance : Heap?
+  @@instance = Pointer(Heap).null
 
   def self.init(end_of_kernel : USize)
-    @@instance = Heap.new end_of_kernel
+    heap = Heap.new end_of_kernel
+    @@instance = pointerof(heap)
   end
 
   def initialize(end_of_kernel : USize)
@@ -39,13 +40,19 @@ struct Heap
   def self.calloc(size : USize) : Pointer(UInt8)
     instance = @@instance
     return Pointer(UInt8).null unless instance
-    instance.calloc size
+    instance.value.calloc size
   end
 
   def self.kalloc(size : USize) : Pointer(UInt8)
     instance = @@instance
     return Pointer(UInt8).null unless instance
-    instance.kalloc size
+    instance.value.kalloc size
+  end
+  
+  def self.addr() : USize
+    instance = @@instance
+    return 0u32 unless instance
+    instance.value.@free_addr.address.to_u32
   end
 
   def calloc(size : USize) : Pointer(UInt8)
@@ -94,21 +101,17 @@ struct Heap
   private def get_block(size : USize) : Pointer(Block) | Nil
     i = @free_top
     p = @free_top
-    while !i.null?
-      i_val = i.value
-      p_val = p.value
-      return if i_val.nil?
-      return if p_val.nil?
-      if i_val.block_size > size
-        if i == p
-          @free_top = i_val.block_next
+    while i
+      if i.value.block_size > size
+        if p == i
+          @free_top = i.value.block_next
         else
-          p_val.block_next = i_val.block_next
+          i.value.block_next = i.value.block_next
         end
         return i
       end
       p = i
-      i = i_val.block_next
+      i = i.value.block_next
     end
   end
 
