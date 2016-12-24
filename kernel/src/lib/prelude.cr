@@ -2,7 +2,7 @@
 # https://github.com/crystal-lang/crystal/blob/master/src/prelude.cr
 
 # This list requires ordered statements
-require "./string"
+require "./kspec"
 
 # Alpha-sorted list
 # a
@@ -21,7 +21,6 @@ require "./heap"
 require "./int"
 # j
 # k
-require "./kspec"
 # l
 # m
 require "./memory"
@@ -38,6 +37,7 @@ require "./raise"
 require "./reference"
 # s
 require "./serial"
+require "./string"
 # t
 require "./terminal"
 require "./types"
