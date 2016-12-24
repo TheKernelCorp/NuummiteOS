@@ -43,7 +43,8 @@ struct Nil
   end
 
   def not_nil!
-    raise "Nil assertion failed"
+    return true
+    #raise "Nil assertion failed"
   end
 
   def clone
