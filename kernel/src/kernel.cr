@@ -5,10 +5,15 @@ lib LibBootstrap
 end
 
 fun kearly(mboot_ptr : MultibootPointer)
+  include Dev
   sym = LibBootstrap.end_of_kernel
   end_of_kernel = pointerof(sym)
   puts end_of_kernel.address
   Heap.init end_of_kernel.address.to_u32
+
+fun kearly(mboot_ptr : MultibootPointer)
+  Heap.init MultibootHelper.load(mboot_ptr).end_of_kernel
+  DeviceManager.init
   run_self_tests
 end
 
@@ -22,6 +27,7 @@ def run_self_tests
   run_tests Tests, [
     heap_calloc,
     heap_kalloc,
+    dev_serial,
   ]
   puts "FYI the kernel is still running."
 end
@@ -36,5 +42,10 @@ module Tests
   test heap_kalloc, "Heap#kalloc", begin
     ptr = HeapAllocator(UInt64).kalloc
     assert_not ptr.null?
+  end
+
+  test dev_serial, "Device#serial", begin
+    serial = DeviceManager.get_device("ttys0")
+    assert_not serial.not_nil!
   end
 end

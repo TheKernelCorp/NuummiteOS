@@ -23,7 +23,7 @@ PROJECTS:=$(SYSTEM_PROJECTS)
 
 export DESTDIR:=$(PWD)/sysroot
 
-.PHONY: all iso sysroot projects qemu qemu-curses clean
+.PHONY: all iso sysroot projects qemu qemu-curses check clean
 
 all: iso
 
@@ -37,7 +37,7 @@ sysroot:
 	mkdir -p isodir/boot/grub
 	cp sysroot/boot/nuummite.kern isodir/boot/nuummite.kern
 
-projects:
+projects: clean
 	for PROJECT in $(PROJECTS); do \
 		make -s -C $$PROJECT install ; \
 	done
