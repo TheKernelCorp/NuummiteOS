@@ -29,7 +29,6 @@ require "./linked_list"
 require "./memory"
 require "./multiboot"
 # n
-require "./named_tuple"
 require "./nil"
 # o
 require "./object"
@@ -47,7 +46,6 @@ require "./singleton"
 require "./string"
 # t
 require "./terminal"
-require "./tuple"
 require "./types"
 # u
 # v
