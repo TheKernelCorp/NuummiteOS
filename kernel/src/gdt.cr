@@ -1,3 +1,6 @@
+# TODO: Make this work.
+# You can find the 'real' GDT at kernel/arch/i386/asm/gdt.asm
+
 alias GDTEntry = LibGDT::GDTEntry
 alias GDTEntries = LibGDT::GDTEntries
 alias GDTPointer = LibGDT::GDTPointer
@@ -70,34 +73,33 @@ end
 
 struct GDT
   def initialize
-    # raise "Crystal based GDT not working"
-    @ptr = GDTPointer.new
-    @gdt = GDTEntries.new
-    @tss = TSSEntry.new
+    @ptr = uninitialized GDTPointer
+    @gdt = uninitialized GDTEntries
+    @tss = uninitialized TSSEntry
 
-    @ptr.limit = sizeof(GDTEntry) * 6;
+    @ptr.limit = (sizeof(GDTEntry) * 5) - 1;
     @ptr.base = pointerof(@gdt).address.to_u32
 
     set_gate @gdt.null, 0u32, 0u32, 0u8, 0u8
-    set_gate @gdt.kern_code, 0u32, 0xFFFFFFFFu32, 0x9Au8, 0xCFu8
-    set_gate @gdt.kern_data, 0u32, 0xFFFFFFFFu32, 0x92u8, 0xCFu8
-    set_gate @gdt.user_code, 0u32, 0xFFFFFFFFu32, 0xFAu8, 0xCFu8
-    set_gate @gdt.user_data, 0u32, 0xFFFFFFFFu32, 0xF2u8, 0xCFu8
+    set_gate @gdt.kern_code, 0_u32, 0xFF_FF_FF_FF_u32, 0x9A_u8, 0xCF_u8
+    set_gate @gdt.kern_data, 0_u32, 0xFF_FF_FF_FF_u32, 0x92_u8, 0xCF_u8
+    set_gate @gdt.user_code, 0_u32, 0xFF_FF_FF_FF_u32, 0xFA_u8, 0xCF_u8
+    set_gate @gdt.user_data, 0_u32, 0xFF_FF_FF_FF_u32, 0xF2_u8, 0xCF_u8
 
-    write_tss @gdt.tss, 0x10u16, 0x00u32
+    # write_tss @gdt.tss, 0x10u16, 0x00u32
 
     print "before_flush"
-
     LibGDT.gdt_flush pointerof(@ptr).address.to_u32
+    asm("cli; hlt");
     print "after_flush"
-    LibTSS.tss_flush
+    #LibTSS.tss_flush
   end
 
   def set_gate(entry : GDTEntry, base : UInt32, limit : UInt32, access : UInt8, gran : UInt8)
-    entry.base_low = base.to_u16
-    entry.base_middle = (base >> 16).to_u8
-    entry.base_high = (base >> 24).to_u8
-    entry.limit_low = limit.to_u16
+    entry.base_low = (base & 0xFFFF).to_u16
+    entry.base_middle = ((base >> 16) & 0xFF).to_u8
+    entry.base_high = ((base >> 24) & 0xFF).to_u8
+    entry.limit_low = (limit & 0xFFFF).to_u16
     entry.granularity = ((limit >> 16) & 0x0F).to_u8
     entry.granularity |= (gran & 0xF0).to_u8
     entry.access = access

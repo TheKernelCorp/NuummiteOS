@@ -27,10 +27,10 @@ resb 16384 ; 16 KiB
 .top:
 
 section .text
+bits 32
 global _start
 extern kearly
 extern kmain
-bits 32
 
 ;
 ; This is where GRUB takes us.

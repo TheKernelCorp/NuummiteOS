@@ -1,17 +1,17 @@
 lib LibBootstrap
   $end_of_kernel = END_OF_KERNEL : UInt32
+  fun setup_gdt = "gdt_load"
 end
 
 require "./lib/prelude"
-require "./gdt"
 
 fun kearly(mboot_ptr : MultibootPointer)
   # The following code breaks stuff
   # sym = LibBootstrap.end_of_kernel
   # end_of_kernel = pointerof(sym)
   # Heap.init end_of_kernel.address.to_u32
+  LibBootstrap.setup_gdt
   Heap.init 2_000_000_u32
-  GDT.new
   init_devices
   run_self_tests
 end
@@ -26,6 +26,7 @@ end
 fun kmain
   puts "Hello from Nuummite!"
   writeln ttys0, "Hello, world!"
+  puts 1337
 end
 
 def run_self_tests
