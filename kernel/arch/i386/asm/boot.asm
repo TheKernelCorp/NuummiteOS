@@ -30,6 +30,7 @@ section .text
 global _start
 extern kearly
 extern kmain
+bits 32
 
 ;
 ; This is where GRUB takes us.

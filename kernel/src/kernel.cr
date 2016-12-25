@@ -3,6 +3,7 @@ lib LibBootstrap
 end
 
 require "./lib/prelude"
+require "./gdt"
 
 fun kearly(mboot_ptr : MultibootPointer)
   # The following code breaks stuff
@@ -10,6 +11,7 @@ fun kearly(mboot_ptr : MultibootPointer)
   # end_of_kernel = pointerof(sym)
   # Heap.init end_of_kernel.address.to_u32
   Heap.init 2_000_000_u32
+  GDT.new
   init_devices
   run_self_tests
 end

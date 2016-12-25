@@ -133,6 +133,7 @@ module StaticArrayTests
   def self.run
     run_tests [
       static_array,
+      static_array_ptr,
     ]
   end
   
@@ -143,5 +144,15 @@ module StaticArrayTests
     arr[1] = 32_u8
     assert_eq arr[0], 64_u8
     assert_eq arr[1], 32_u8
+  end
+
+  test static_array_ptr, "StaticArray#ptr[]/ptr[]=", begin
+    panic_on_fail!
+    arr = uninitialized UInt8[2]
+    ptr = arr.to_unsafe
+    ptr[0] = 64_u8
+    ptr[1] = 32_u8
+    assert_eq ptr[0], 64_u8
+    assert_eq ptr[1], 32_u8
   end
 end
