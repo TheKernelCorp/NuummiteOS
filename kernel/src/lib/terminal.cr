@@ -1,19 +1,39 @@
 Terminal = TerminalDevice.new
 
-def print(str : String)
-  Terminal.write str
+def print(val : String)
+  Terminal.write val
 end
 
 def print(val : Int)
+  sign = val
+  arr = uninitialized UInt8[22]
   base = '0'.ord.to_u8
-  if val < 0
+  accum = 0
+  if sign < 0
     val = 0 - val
-    Terminal.write_byte '-'.ord.to_u8
   end
   while true
-    Terminal.write_byte (val.to_i % 10).to_u8 + base
+    arr[accum] = (val.to_i % 10).to_u8 + base
     val = val.to_i / 10
+    accum += 1
     break if val == 0
+  end
+  if sign < 0
+    arr[accum] = '-'.ord.to_u8
+    accum += 1
+  end
+  arr[accum] = '\0'.ord.to_u8
+  i = 0
+  j = accum - 1
+  while i < j
+    c = arr[i]
+    arr[i] = arr[j]
+    arr[j] = c
+    i += 1
+    j -= 1
+  end
+  accum.times do |i|
+    Terminal.write_byte arr[i]
   end
 end
 
