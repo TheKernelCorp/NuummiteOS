@@ -17,8 +17,7 @@ require "./exceptions"
 require "./gc"
 require "./gc/minimal"
 # h
-require "./hardware/device.cr"
-require "./hardware/dev_manager.cr"
+require "./hardware"
 require "./heap"
 # i
 require "./int"
