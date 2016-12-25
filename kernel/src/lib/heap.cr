@@ -119,3 +119,36 @@ struct Heap
     (addr % ALIGN) + addr
   end
 end
+
+module HeapTests
+  def self.run
+    run_tests [
+      heap_calloc,
+      heap_kalloc,
+      heap_kalloc_diff,
+    ]
+  end
+  
+  test heap_calloc, "Heap#calloc", begin
+    panic_on_fail!
+    ptr = HeapAllocator(UInt64).calloc
+    assert_not ptr.null?
+    assert_eq ptr.value, 0_u64
+  end
+
+  test heap_kalloc, "Heap#kalloc", begin
+    panic_on_fail!
+    ptr = HeapAllocator(UInt64).kalloc
+    assert_not ptr.null?
+  end
+
+  test heap_kalloc_diff, "Heap#kalloc/diversity", begin
+    panic_on_fail!
+    ptr_a = HeapAllocator(UInt64).kalloc
+    addr_a = Heap.addr
+    ptr_b = HeapAllocator(UInt64).kalloc
+    addr_b = Heap.addr
+    assert_not_eq addr_a, addr_b
+    assert_not_eq ptr_a.address, ptr_b.address
+  end
+end

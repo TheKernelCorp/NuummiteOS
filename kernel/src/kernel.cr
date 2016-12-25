@@ -25,38 +25,21 @@ end
 
 def run_self_tests
   puts "Testing kernel integrity..."
-  run_tests Tests, [
-    heap_calloc,
-    heap_kalloc,
-    heap_kalloc_diff,
-    dev_serial,
-  ]
+  Tests.run
+  HeapTests.run
+  LinkedListTests.run
   puts "FYI the kernel is still running."
 end
 
 module Tests
-  test heap_calloc, "Heap#calloc", begin
-    ptr = HeapAllocator(UInt64).calloc
-    assert_not ptr.null?
-    assert_eq ptr.value, 0_u64
-  end
-
-  test heap_kalloc, "Heap#kalloc", begin
-    ptr = HeapAllocator(UInt64).kalloc
-    assert_not ptr.null?
-  end
-
-  test heap_kalloc_diff, "Heap#kalloc_diff", begin
-    ptr = HeapAllocator(UInt64).kalloc
-    old = Heap.addr
-    ptr2 = HeapAllocator(UInt64).kalloc
-    new = Heap.addr
-    assert_not_eq old, new
-    assert_not ptr.address == ptr2.address
+  def self.run
+    run_tests [
+      dev_serial
+    ]
   end
 
   test dev_serial, "Device#serial", begin
     serial = DeviceManager.get_device("ttys0")
-    assert_not serial.not_nil!
+    assert serial
   end
 end

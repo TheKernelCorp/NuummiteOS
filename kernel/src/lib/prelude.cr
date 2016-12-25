@@ -11,6 +11,7 @@ require "./kspec"
 require "./class"
 # d
 # e
+require "./exceptions"
 # f
 # g
 require "./gc"
@@ -24,6 +25,7 @@ require "./int"
 # j
 # k
 # l
+require "./linked_list"
 # m
 require "./memory"
 require "./multiboot"
