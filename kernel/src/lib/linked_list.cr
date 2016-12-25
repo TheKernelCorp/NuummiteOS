@@ -54,6 +54,19 @@ class LinkedList(T)
         last.data
     end
 
+    def each
+        node = @head
+        return unless node
+        until node.next.nil?
+            node = node.next
+            return unless node
+            data = node.data
+            if data
+                yield data
+            end
+        end
+    end
+
     def count : Int
         @count
     end
@@ -80,6 +93,7 @@ module LinkedListTests
         run_tests [
             push,
             pop,
+            each,
             count,
             index,
         ]
@@ -103,6 +117,18 @@ module LinkedListTests
         assert b
         assert_eq 1, a
         assert_eq 2, b
+    end
+
+    test each, "LinkedList#each", begin
+        list = LinkedList(Int32).new
+        iterations = 10
+        iterations.times { |i| list.push i }
+        i = 0
+        list.each do |x|
+            assert_eq i, x
+            i += 1
+        end
+        assert_eq iterations, i
     end
 
     test push, "LinkedList#push", begin

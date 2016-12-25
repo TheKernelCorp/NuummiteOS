@@ -1,8 +1,11 @@
 macro write(device, data)
     %data = {{ data }}
     %ptr = pointerof(%data.@c)
-    %data.@length.times do |i|
-        {{ device }}.write_byte %ptr[i]
+    device = DeviceManager.get_device {{ device.stringify }}
+    if device
+        %data.@length.times do |i|
+            device.write_byte %ptr[i]
+        end
     end
 end
 

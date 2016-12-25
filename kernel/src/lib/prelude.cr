@@ -43,6 +43,7 @@ require "./raise"
 require "./reference"
 # s
 require "./serial"
+require "./singleton"
 require "./string"
 # t
 require "./terminal"
