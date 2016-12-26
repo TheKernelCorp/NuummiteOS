@@ -26,7 +26,6 @@ end
 fun kmain
   puts "Hello from Nuummite!"
   writeln ttys0, "Hello, world!"
-  puts 1337
 end
 
 def run_self_tests
