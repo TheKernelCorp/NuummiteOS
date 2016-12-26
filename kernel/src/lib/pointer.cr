@@ -9,25 +9,29 @@ struct Pointer(T)
 
   def -(other : Int)
     if other > address
-      raise
+      panic
     end
-    self - other.to_i64
+    self + (0 - other)
   end
 
   def <(other : Pointer(_))
-    self.address < other.address
+    self < other
   end
 
   def >(other : Pointer(_))
-    self.address > other.address
+    self > other
   end
 
   def ==(other : Int)
-    address == other.to_i64
+    self.address == other.to_i64
   end
 
   def ==(other : Pointer(_))
-    self.address == other.address
+    self == other
+  end
+
+  def <=>(other : self)
+    address <=> other.address
   end
 
   def [](offset : Int) : T
@@ -44,5 +48,9 @@ struct Pointer(T)
 
   def to_byte_ptr
     self.as UInt8*
+  end
+
+  def to_void_ptr
+    self.as Void*
   end
 end
