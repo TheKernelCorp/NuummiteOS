@@ -4,6 +4,10 @@ def print(val : String)
   Terminal.write val
 end
 
+def print(val : Bool)
+  Terminal.write val ? "true" : "false"
+end
+
 def print(val : Int)
   sign = val
   arr = uninitialized UInt8[22]

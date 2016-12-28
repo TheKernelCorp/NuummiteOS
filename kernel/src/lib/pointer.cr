@@ -15,19 +15,19 @@ struct Pointer(T)
   end
 
   def <(other : Pointer(_))
-    self < other
+    address < other.address
   end
 
   def >(other : Pointer(_))
-    self > other
+    address > other.address
   end
 
   def ==(other : Int)
-    self.address == other.to_i64
+    address == other.address.to_i64
   end
 
   def ==(other : Pointer(_))
-    self == other
+    address == other.address
   end
 
   def <=>(other : self)

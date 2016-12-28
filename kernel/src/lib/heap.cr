@@ -85,7 +85,7 @@ struct Heap
 
   private def get_or_alloc_block(size : USize) : Block* | Nil
     block = get_block size
-    if get_block(size).is_a? Nil
+    if !block
       block = alloc_block(sizeof(Block).to_u32).as Block*
       return unless block
       block.value.block_size = size
@@ -108,13 +108,13 @@ struct Heap
   def free(ptr : Pointer(_))
     i = @used_top
     p = i
-    until i.is_a?(Nil) || i.null?
-      if i.value.block_chunk.address == ptr.address
-        # block = i.value.block_chunk.as UInt32*
-        # unless (block - 4).value == GUARD1 && (block + i.value.block_size).value == GUARD2
-        #   panic "Heap corruption!"
-        # end
-        if p.address == i.address
+    while i
+      if i.value.block_chunk == ptr
+        block = i.value.block_chunk.as UInt32*
+        unless (block - 1).value == GUARD1 && (block + (i.value.block_size / 4) + 4).value == GUARD2
+          panic "Heap corruption!"
+        end
+        if p == i
           @used_top = i.value.block_next
         else
           p.value.block_next = i.value.block_next
@@ -131,7 +131,7 @@ struct Heap
     i = @free_top
     p = @free_top
     while i
-      if i.value.block_size > size
+      if i.value.block_size <= size
         if p == i
           @free_top = i.value.block_next
         else
@@ -156,6 +156,7 @@ module HeapTests
       heap_kalloc,
       heap_kalloc_diff,
       heap_free,
+      heap_free_alloc,
     ]
   end
   
@@ -181,7 +182,7 @@ module HeapTests
     ptr_b = HeapAllocator(UInt8).kalloc
     addr_b = Heap.addr
     assert_not_eq addr_a, addr_b
-    assert_not_eq ptr_a.address, ptr_b.address
+    assert_not_eq ptr_a, ptr_b
   end
 
   test heap_free, "Heap#free", begin
@@ -190,5 +191,13 @@ module HeapTests
     assert ptr_a
     assert_not ptr_a.null?
     Heap.free ptr_a
+  end
+
+  test heap_free_alloc, "Heap#free/alloc", begin
+    panic_on_fail!
+    ptr_a = HeapAllocator(UInt32).kalloc
+    Heap.free ptr_a
+    ptr_b = HeapAllocator(UInt32).kalloc
+    assert ptr_a == ptr_b
   end
 end
