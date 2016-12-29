@@ -254,10 +254,13 @@ module HeapTests
     panic_on_fail!
     ptr = HeapAllocator(UInt8).kalloc
     assert ptr
+    addr_a = ptr.address
     ptr.value = 123_u8
     ptr = HeapAllocator(UInt16).realloc ptr
     assert ptr
+    addr_b = ptr.address
     assert_eq 123_u16, ptr.value
+    assert_eq addr_a, addr_b
     Heap.free ptr
   end
 end
