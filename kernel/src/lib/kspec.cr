@@ -34,15 +34,12 @@ macro assert_not_eq(a, b)
 end
 
 macro __test_fail(expected, actual)
-    print "[Test] Failed: "
-    print __test_name
-    print "\n"
+    print "[Test] FAIL "
+    puts __test_name
     print "-----> Expect: "
-    print {{ expected.stringify }}
-    print "\n"
+    puts {{ expected.stringify }}
     print "-----> Actual: "
-    print {{ actual.stringify }}
-    print "\n"
+    puts {{ actual.stringify }}
     __test_fail_and_panic if __test_panic_on_fail
     return
 end
@@ -52,7 +49,6 @@ macro __test_fail_and_panic
 end
 
 macro __test_ok
-    print "[Test] Succeeded: "
-    print __test_name
-    print "\n"
+    print "[Test]  OK  "
+    puts __test_name
 end
