@@ -16,6 +16,7 @@ require "./exceptions"
 # g
 require "./gc"
 require "./gc/minimal"
+require "./gdt"
 # h
 require "./hardware"
 require "./heap"
