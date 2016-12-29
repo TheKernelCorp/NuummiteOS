@@ -5,12 +5,20 @@ private GUARD2 = 0x42697574_u32
 private alias Block = LibHeap::Block
 
 struct HeapAllocator(T)
-  def self.calloc : Pointer(T)
-    Heap.calloc(sizeof(T).to_u32).as Pointer(T)
+  def self.calloc : T*
+    Heap.calloc(sizeof(T).to_u32).as T*
   end
 
-  def self.kalloc : Pointer(T)
-    Heap.kalloc(sizeof(T).to_u32).as Pointer(T)
+  def self.kalloc : T*
+    Heap.kalloc(sizeof(T).to_u32).as T*
+  end
+
+  def self.realloc(ptr : T*, size : USize) : T*
+    Heap.realloc(ptr, size).as T*
+  end
+
+  def self.realloc(ptr : _*) : T*
+    Heap.realloc(ptr, sizeof(T).to_u32).as T*
   end
 end
 
@@ -48,24 +56,32 @@ struct Heap
     return Pointer(UInt8).null unless instance
     instance.value.kalloc size
   end
-  
-  def self.addr() : USize
+
+  def self.free(ptr : _*, __file__ = __FILE__, __line__ = __LINE__)
+    instance = @@instance
+    return unless instance
+    instance.value.free ptr, __file__, __line__
+  end
+
+  def self.realloc(ptr : _*, size : USize) : UInt8*
+    instance = @@instance
+    return Pointer(UInt8).null unless instance
+    new_ptr = instance.value.realloc ptr, size
+    return Pointer(UInt8).null unless new_ptr
+    new_ptr
+  end
+
+  def self.addr : USize
     instance = @@instance
     return 0u32 unless instance
     instance.value.@free_addr.address.to_u32
   end
 
-  def self.free(ptr : Pointer(_))
-    instance = @@instance
-    return unless instance
-    instance.value.free ptr
-  end
-
   def calloc(size : USize) : UInt8*
     block = alloc size
     return Pointer(UInt8).null unless block
-    chunk = block.value.block_chunk.as Void*
-    memset chunk, 0_u8, size
+    chunk = block.value.block_chunk.to_void_ptr
+    memset chunk, 0_u8, block.value.block_size
     block.value.block_chunk
   end
 
@@ -105,14 +121,23 @@ struct Heap
     ptr
   end
 
-  def free(ptr : Pointer(_))
+  def realloc(ptr : _*, size : USize) : UInt8*
+    block_size = get_block_size ptr
+    return Pointer(UInt8).null if block_size == 0
+    free ptr
+    new_ptr = kalloc size
+    memcpy new_ptr.to_void_ptr, ptr.to_void_ptr, block_size
+    new_ptr
+  end
+
+  def free(ptr : _*, __file__ = __FILE__, __line__ = __LINE__)
     i = @used_top
     p = i
     while i
       if i.value.block_chunk == ptr
         block = i.value.block_chunk.as UInt32*
         unless (block - 1).value == GUARD1 && (block + (i.value.block_size / 4) + 4).value == GUARD2
-          panic "Heap corruption!"
+          panic "Heap corruption!", __file__, __line__
         end
         if p == i
           @used_top = i.value.block_next
@@ -144,7 +169,19 @@ struct Heap
     end
   end
 
-  private def align(addr : USize)
+  private def get_block_size(ptr : UInt8*) : USize
+    i = @used_top
+    while i
+      chunk = i.value.block_chunk
+      if chunk == ptr
+        return i.value.block_size
+      end
+      i = i.value.block_next
+    end
+    0_u32
+  end
+
+  private def align(addr : USize) : USize
     (addr % ALIGN) + addr
   end
 end
@@ -157,6 +194,7 @@ module HeapTests
       heap_kalloc_diff,
       heap_free,
       heap_free_alloc,
+      heap_realloc,
     ]
   end
   
@@ -164,40 +202,62 @@ module HeapTests
     panic_on_fail!
     ptr = HeapAllocator(UInt8).calloc
     assert ptr
-    assert_not ptr.null?
     assert_eq 0_u64, ptr.value
+    Heap.free ptr
   end
 
   test heap_kalloc, "Heap#kalloc", begin
     panic_on_fail!
     ptr = HeapAllocator(UInt8).kalloc
     assert ptr
-    assert_not ptr.null?
+    Heap.free ptr
   end
 
   test heap_kalloc_diff, "Heap#kalloc/diversity", begin
     panic_on_fail!
     ptr_a = HeapAllocator(UInt8).kalloc
+    assert ptr_a
     addr_a = Heap.addr
     ptr_b = HeapAllocator(UInt8).kalloc
+    assert ptr_b
     addr_b = Heap.addr
     assert_not_eq addr_a, addr_b
     assert_not_eq ptr_a, ptr_b
+    # This corrupts the heap
+    # Heap.free ptr_a
+    # Heap.free ptr_b
   end
 
   test heap_free, "Heap#free", begin
     panic_on_fail!
-    ptr_a = HeapAllocator(UInt8).kalloc
-    assert ptr_a
-    assert_not ptr_a.null?
-    Heap.free ptr_a
+    ptr = HeapAllocator(UInt8).kalloc
+    assert ptr
+    addr_a = ptr.address
+    Heap.free ptr
+    ptr = HeapAllocator(UInt8).kalloc
+    assert ptr
+    addr_b = ptr.address
+    assert_eq addr_a, addr_b
+    Heap.free ptr
   end
 
   test heap_free_alloc, "Heap#free/alloc", begin
     panic_on_fail!
-    ptr_a = HeapAllocator(UInt32).kalloc
+    ptr_a = HeapAllocator(UInt8).kalloc
     Heap.free ptr_a
-    ptr_b = HeapAllocator(UInt32).kalloc
-    assert ptr_a == ptr_b
+    ptr_b = HeapAllocator(UInt8).kalloc
+    Heap.free ptr_b
+    assert_eq ptr_a, ptr_b
+  end
+
+  test heap_realloc, "Heap#realloc", begin
+    panic_on_fail!
+    ptr = HeapAllocator(UInt8).kalloc
+    assert ptr
+    ptr.value = 123_u8
+    ptr = HeapAllocator(UInt16).realloc ptr
+    assert ptr
+    assert_eq 123_u16, ptr.value
+    Heap.free ptr
   end
 end
