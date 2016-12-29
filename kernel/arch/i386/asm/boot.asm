@@ -63,3 +63,9 @@ nu_flush_gdt:
     jmp 0x08:.flush
 .flush:
     ret
+
+global nu_flush_tss
+nu_flush_tss:
+    mov ax, 0x2b
+    ltr ax
+    ret
