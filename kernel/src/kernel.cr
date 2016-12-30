@@ -31,6 +31,7 @@ def run_self_tests
   puts "Testing kernel integrity..."
   Tests.run
   HeapTests.run
+  ArrayTests.run
   LinkedListTests.run
   StaticArrayTests.run
   puts "FYI the kernel is still running."

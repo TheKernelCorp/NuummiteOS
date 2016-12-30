@@ -3,9 +3,12 @@
 
 # This list requires ordered statements
 require "./kspec"
+require "./object"
+require "./indexable"
 
 # Alpha-sorted list
 # a
+require "./array"
 # b
 # c
 require "./class"
@@ -32,7 +35,6 @@ require "./multiboot"
 # n
 require "./nil"
 # o
-require "./object"
 # p
 require "./panic"
 require "./pointer"
