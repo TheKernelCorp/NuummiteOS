@@ -49,6 +49,6 @@ macro __test_fail_and_panic
 end
 
 macro __test_ok
-    print "[Test]  OK  "
-    puts __test_name
+    write ttys0, "[Test]  OK  "
+    writeln ttys0, __test_name
 end
