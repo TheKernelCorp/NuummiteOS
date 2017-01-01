@@ -1,0 +1,21 @@
+# This list requires ordered statements
+require "./runtime/indexable"
+
+# Alpha-sorted list
+require "./runtime/array"
+require "./runtime/class"
+require "./runtime/exceptions"
+require "./runtime/gc"
+require "./runtime/heap"
+require "./runtime/int"
+require "./runtime/linked_list"
+require "./runtime/nil"
+require "./runtime/object"
+require "./runtime/panic"
+require "./runtime/pointer"
+require "./runtime/raise"
+require "./runtime/reference"
+require "./runtime/singleton"
+require "./runtime/static_array"
+require "./runtime/string"
+require "./runtime/types"
