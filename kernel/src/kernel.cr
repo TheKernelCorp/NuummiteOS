@@ -10,6 +10,8 @@ fun kearly(mboot_ptr : MultibootPointer)
   # end_of_kernel = pointerof(sym)
   # Heap.init end_of_kernel.address.to_u32
   setup_gdt_tss
+  PIC.remap
+  PIC.enable
   Heap.init 2_000_000_u32
   init_devices
   run_self_tests
