@@ -15,7 +15,10 @@ struct Int
     if other == 0
       self
     end
-    unsafe_div other
+    div = unsafe_div other
+    mod = unsafe_mod other
+    div -= 1 if other > 0 ? mod < 0 : mod > 0
+    div
   end
 
   def %(other : Int)

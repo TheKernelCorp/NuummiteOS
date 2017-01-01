@@ -9,16 +9,27 @@ def print(val : Bool)
 end
 
 def print(val : Int)
+  if val > 0xFFFFFFFF
+    print val >> 0x20
+    print val & 0xFFFFFFFF
+    return
+  end
   sign = val
-  arr = uninitialized UInt8[22]
-  base = '0'.ord.to_u8
+  arr = uninitialized UInt8[18]
   accum = 0
   if sign < 0
     val = 0 - val
   end
+  val = val.to_u
+  lut = StaticArray[
+    '0', '1', '2', '3',
+    '4', '5', '6', '7',
+    '8', '9', 'A', 'B',
+    'C', 'D', 'E', 'F'
+  ]
   while true
-    arr[accum] = (val.to_i % 10).to_u8 + base
-    val = val.to_i / 10
+    arr[accum] = lut[(val % 16)].ord.to_u8
+    val = val / 16
     accum += 1
     break if val == 0
   end
