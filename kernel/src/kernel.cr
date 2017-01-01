@@ -9,7 +9,7 @@ fun kearly(mboot_ptr : MultibootPointer)
   # sym = LibBootstrap.end_of_kernel
   # end_of_kernel = pointerof(sym)
   # Heap.init end_of_kernel.address.to_u32
-  setup_gdt_tss
+  GDT.setup
   PIC.remap
   PIC.enable
   Heap.init 2_000_000_u32

@@ -65,7 +65,7 @@ private TSS =
     seg_priv(3_u64) |
     SEG_CODE_EXA
 
-lib LibGDT
+private lib LibGDT
     fun flush_gdt = "nu_flush_gdt"(ptr : UInt32)
 
     @[Packed]
@@ -85,7 +85,7 @@ lib LibGDT
     end
 end
 
-lib LibTSS
+private lib LibTSS
     fun flush_tss = "nu_flush_tss"
 
     @[Packed]
@@ -120,49 +120,54 @@ lib LibTSS
     end
 end
 
-fun create_descriptor(base : UInt64, limit : UInt64, flag : UInt64) : UInt64
-    flag = flag.to_u64 & 0x0000FFFF_u64
-    desc = limit & 0x000F0000_u64
-    desc |= (flag << 0x08_u64) & 0x00F0FF00_u64
-    desc |= (base >> 0x10_u64) & 0x000000FF_u64
-    desc |= base & 0xFF000000_u64
-    desc <<= 32_u64
-    desc |= base << 16_u64
-    desc |= limit & 0x0000FFFF_u64
-    desc
-end
+struct GDT
+    def self.setup
+        tss = uninitialized LibTSS::TSS32
+        gdt = uninitialized LibGDT::GDT32
+        gdtr = uninitialized LibGDT::GDTR
+        tssp = pointerof(tss)
+        gdtp = pointerof(gdt)
+        gdtrp = pointerof(gdtr)
+        gdtr.base = gdtp.address.to_u32
+        gdtr.limit = sizeof(LibGDT::GDT32).to_u32 - 1
+        self.setup_gdt gdtp
+        self.setup_tss gdtp, tssp
+        LibGDT.flush_gdt gdtrp.address
+        LibTSS.flush_tss
+    end
 
-fun setup_gdt_tss
-    gdt = uninitialized LibGDT::GDT32
-    gdtr = uninitialized LibGDT::GDTR
-    tss = uninitialized LibTSS::TSS32
-    setup_gdt gdt, gdtr
-    setup_tss gdt, tss
-    LibGDT.flush_gdt pointerof(gdtr).address
-    LibTSS.flush_tss
-end
+    def self.setup_gdt(gdtp)
+        gdtp.value.null = self.create_descriptor NULL, NULL, NULL
+        gdtp.value.kernel_code = self.create_descriptor NULL, SEG_LIMIT, CODE_PL0
+        gdtp.value.kernel_data = self.create_descriptor NULL, SEG_LIMIT, DATA_PL0
+        gdtp.value.user_code = self.create_descriptor NULL, SEG_LIMIT, CODE_PL3
+        gdtp.value.user_data = self.create_descriptor NULL, SEG_LIMIT, DATA_PL3
+    end
 
-macro setup_gdt(gdt, gdtr)
-    gdt.null = create_descriptor NULL, NULL, NULL
-    gdt.kernel_code = create_descriptor NULL, SEG_LIMIT, CODE_PL0
-    gdt.kernel_data = create_descriptor NULL, SEG_LIMIT, DATA_PL0
-    gdt.user_code = create_descriptor NULL, SEG_LIMIT, CODE_PL3
-    gdt.user_data = create_descriptor NULL, SEG_LIMIT, DATA_PL3
-    gdtr.base = pointerof(gdt).address.to_u32
-    gdtr.limit = sizeof(LibGDT::GDT32).to_u32 - 1
-end
+    def self.setup_tss(gdtp, tssp)
+        tss_size = sizeof(LibTSS::TSS32)
+        tss_base = tssp.address
+        tss_limit = tss_base + tss_size
+        memset tssp.to_void_ptr, 0u8, tss_size.to_u32
+        tssp.value.ss0 = 0x10
+        tssp.value.cs = 0x0b
+        tssp.value.ss = 0x13
+        tssp.value.ds = 0x13
+        tssp.value.es = 0x13
+        tssp.value.fs = 0x13
+        tssp.value.gs = 0x13
+        gdtp.value.tss = self.create_descriptor tss_base, tss_limit, TSS
+    end
 
-macro setup_tss(gdt, tss)
-    %size = sizeof(LibTSS::TSS32)
-    %base = pointerof(tss).address
-    %limit = %base + %size
-    gdt.tss = create_descriptor %base, %limit, TSS
-    memset pointerof(tss).to_void_ptr, 0u8, %size.to_u32
-    tss.ss0 = 0x10
-    tss.cs = 0x0b
-    tss.ss = 0x13
-    tss.ds = 0x13
-    tss.es = 0x13
-    tss.fs = 0x13
-    tss.gs = 0x13
+    def self.create_descriptor(base : UInt64, limit : UInt64, flag : UInt64) : UInt64
+        flag = flag.to_u64 & 0x0000FFFF_u64
+        desc = limit & 0x000F0000_u64
+        desc |= (flag << 0x08_u64) & 0x00F0FF00_u64
+        desc |= (base >> 0x10_u64) & 0x000000FF_u64
+        desc |= base & 0xFF000000_u64
+        desc <<= 32_u64
+        desc |= base << 16_u64
+        desc |= limit & 0x0000FFFF_u64
+        desc
+    end
 end
