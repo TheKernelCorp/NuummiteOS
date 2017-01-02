@@ -1,4 +1,5 @@
 # This list requires ordered statements
+require "./runtime/object"
 require "./runtime/indexable"
 
 # Alpha-sorted list
@@ -10,10 +11,10 @@ require "./runtime/heap"
 require "./runtime/int"
 require "./runtime/linked_list"
 require "./runtime/nil"
-require "./runtime/object"
 require "./runtime/panic"
 require "./runtime/pointer"
 require "./runtime/raise"
+require "./runtime/ref_cell"
 require "./runtime/reference"
 require "./runtime/singleton"
 require "./runtime/static_array"
