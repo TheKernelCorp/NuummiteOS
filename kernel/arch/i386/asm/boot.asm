@@ -12,25 +12,9 @@ align 4
     dd FLAGS
     dd CHECKSUM
 
-section .bss
-align 4096
-page_tables:
-.p4:
-    resb 4096
-.p3:
-    resb 4096
-.p2:
-    resb 4096
-stack:
-.bottom:
-resb 16384 ; 16 KiB
-.top:
-
 section .text
-bits 32
 global _start
-extern kearly
-extern kmain
+bits 32
 
 ;
 ; This is where GRUB takes us.
@@ -44,28 +28,81 @@ _start:
 ; Jumps into the Crystal kernel.
 ;
 enter_kernel:
+    extern kearly
     call kearly
+    extern kmain
     call kmain
 .hang:
     cli
+    hlt
     jmp $
 
-global nu_flush_gdt
-nu_flush_gdt:
+;
+; Nuummite export:
+; Flush GDT
+;
+global glue_flush_gdt
+glue_flush_gdt:
     mov eax, [esp + 4]
     lgdt [eax]
+    jmp 0x08:.flush
+.flush:
     mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
-    jmp 0x08:.flush
-.flush:
     ret
 
-global nu_flush_tss
-nu_flush_tss:
+;
+; Nuummite export:
+; Flush TSS
+;
+global glue_flush_tss
+glue_flush_tss:
     mov ax, 0x2b
     ltr ax
     ret
+
+;
+; Nuummite export:
+; Setup GDT
+;
+global glue_setup_gdt
+glue_setup_gdt:
+    extern gdt_setup
+    call gdt_setup
+    ret
+
+;
+; Nuummite export:
+; Setup IDT
+;
+global glue_setup_idt
+glue_setup_idt:
+    extern idt_setup
+    call idt_setup
+    ret
+
+section .bss
+align 4096
+
+;
+; Page tables.
+;
+page_tables:
+.p4:
+    resb 4096
+.p3:
+    resb 4096
+.p2:
+    resb 4096
+
+;
+; Kernel stack.
+;
+stack:
+.bottom:
+resb 16384 ; 16 KiB
+.top:

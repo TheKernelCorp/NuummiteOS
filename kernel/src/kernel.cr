@@ -12,6 +12,7 @@ fun kearly(mboot_ptr : MultibootPointer)
   GDT.setup
   PIC.remap
   PIC.enable
+  IDT.setup
   Heap.init 2_000_000_u32
   init_devices
   run_self_tests
@@ -27,6 +28,14 @@ end
 fun kmain
   puts "Hello from Nuummite!"
   writeln ttys0, "Hello, world!"
+  asm("sti")
+  #while true
+  #  print "x"
+  #  i = 0_u64
+  #  while i < 0xFFFF
+  #    i += 1
+  #  end
+  #end
 end
 
 def run_self_tests

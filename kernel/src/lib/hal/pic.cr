@@ -36,8 +36,8 @@ private PIC_ICW4_BUF_MASTER = 0x0C_u8
 private PIC_ICW4_SFNM       = 0x10_u8
 
 struct PIC
-    def self.acknowledge(interrupt : Int)
-        if interrupt >= 0x08
+    def self.acknowledge(intr : UInt32)
+        if intr >= 0x08
             outb PIC_SLAVE_COMMAND, PIC_EOI
         end
         outb PIC_MASTER_COMMAND, PIC_EOI
@@ -59,14 +59,14 @@ struct PIC
     end
 
     def self.remap_master
-        outb PIC_MASTER_COMMAND, PIC_ICW1_INIT + PIC_ICW1_ICW4
+        outb PIC_MASTER_COMMAND, PIC_ICW1_INIT | PIC_ICW1_ICW4
         outb PIC_MASTER_DATA, PIC_ICW2_MASTER_OFF
         outb PIC_MASTER_DATA, PIC_ICW3_IRQ2_SLAVE
         outb PIC_MASTER_DATA, PIC_ICW4_8086
     end
 
     def self.remap_slave
-        outb PIC_SLAVE_COMMAND, PIC_ICW1_INIT + PIC_ICW1_ICW4
+        outb PIC_SLAVE_COMMAND, PIC_ICW1_INIT | PIC_ICW1_ICW4
         outb PIC_SLAVE_DATA, PIC_ICW2_SLAVE_OFF
         outb PIC_SLAVE_DATA, PIC_ICW3_CASCADE
         outb PIC_SLAVE_DATA, PIC_ICW4_8086
