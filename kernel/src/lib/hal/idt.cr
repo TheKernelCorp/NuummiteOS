@@ -33,19 +33,16 @@ lib LibIDT
   end
 end
 
-alias InterruptHandler = StackFrame -> Nil
+alias InterruptHandler = -> Nil
 
 struct IDT
   @@handlers = uninitialized Array(InterruptHandler)[16]
 
   def self.setup
     LibGlue.setup_idt
-  end
-
-  def self.setup_handlers
     {% for i in 0...16 %}
-            @@handlers[{{ i }}] = Array(InterruptHandler).new
-        {% end %}
+      @@handlers[{{ i }}] = Array(InterruptHandler).new
+    {% end %}
   end
 
   def self.add_handler(irq : Int, handler : InterruptHandler)
@@ -74,7 +71,7 @@ struct IDT
         i = 0
         while i < @@handlers[irq].size
           callback = @@handlers[irq][i]
-          callback.call frame
+          callback.call
           i += 1
         end
       end

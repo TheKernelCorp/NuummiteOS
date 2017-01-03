@@ -1,5 +1,5 @@
 lib LibBootstrap
-  $end_of_kernel = END_OF_KERNEL : UInt32
+  $end_of_kernel = END_OF_KERNEL : Pointer(UInt8)
 end
 
 require "./lib/prelude"
@@ -12,11 +12,12 @@ fun kearly(mboot_ptr : MultibootPointer)
   GDT.setup
   PIC.remap
   PIC.enable
-  IDT.setup
   Heap.init 2_000_000_u32
-  IDT.setup_handlers
+  IDT.setup
+  PIT.setup 100
   init_devices
   run_self_tests
+  install_irq_handlers
 end
 
 def init_devices
@@ -26,19 +27,16 @@ def init_devices
   SerialDevice.new SERIAL_PORT_3, "ttys3"
 end
 
+def install_irq_handlers
+  IDT.add_handler 0, -> PIT.tick
+end
+
 fun kmain
   puts "Hello from Nuummite!"
   writeln ttys0, "Hello, world!"
   IDT.enable_interrupts
-  xaxaxa
   while true
   end
-end
-
-def xaxaxa
-  puts "This is supposed to print xaxaxa..."
-  IDT.add_handler 0, ->(frame : StackFrame) { print "x" }
-  IDT.add_handler 0, ->(frame : StackFrame) { print "a" }
 end
 
 def run_self_tests
