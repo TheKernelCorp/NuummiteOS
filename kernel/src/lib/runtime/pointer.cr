@@ -42,6 +42,23 @@ struct Pointer(T)
     (self + offset).value = value
   end
 
+  def copy_from(source : Pointer(T), count : Int)
+    source.copy_to self, count
+  end
+
+  def copy_from(source : Pointer(NoReturn), count : Int)
+    raise "Negative count" if count < 0
+    self
+  end
+
+  def copy_to(target : Pointer, count : Int)
+    target.copy_from_impl self, count
+  end
+
+  def clear(count = 1)
+    memset self.to_void_ptr, 0_u8, (count * sizeof(T)).to_u32
+  end
+
   def null?
     address == 0
   end
@@ -52,5 +69,17 @@ struct Pointer(T)
 
   def to_void_ptr
     self.as Void*
+  end
+
+  protected def copy_from_impl(source : Pointer(T), count : Int)
+    raise "Negative count" if count < 0
+    if self.class == source.class
+      memcpy self.to_void_ptr, source.to_void_ptr, (count * sizeof(T)).to_u32
+    else
+      while (count -= 1) >= 0
+        self[count] = source[count]
+      end
+    end
+    self
   end
 end

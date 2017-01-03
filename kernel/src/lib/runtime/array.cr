@@ -1,12 +1,10 @@
 class Array(T)
   include Indexable(T)
-
-  @size : UInt32
-  @capacity : UInt32
+  protected getter size
 
   def initialize
-    @size = 0_u32
-    @capacity = 0_u32
+    @size = 0
+    @capacity = 0
     @buffer = Pointer(T).null
   end
 
@@ -14,8 +12,8 @@ class Array(T)
     if capacity < 0
       panic "Negative array capacity!"
     end
-    @size = 0_u32
-    @capacity = capacity.to_u32
+    @size = 0
+    @capacity = capacity.to_i
     if capacity == 0
       @buffer = Pointer(T).null
     else
@@ -34,6 +32,25 @@ class Array(T)
     self
   end
 
+  def pop
+    pop { raise "Invalid index" } # IndexError.new
+  end
+
+  def pop
+    if @size == 0
+      yield
+    else
+      @size -= 1
+      value = @buffer[@size]
+      (@buffer + @size).clear
+      value
+    end
+  end
+
+  def <<(value : T)
+    push value
+  end
+
   @[AlwaysInline]
   def unsafe_at(index : Int) : T
     @buffer[index]
@@ -48,10 +65,10 @@ class Array(T)
     resize_to_capacity new_capacity
   end
 
-  private def resize_to_capacity(capacity : UInt32)
-    @capacity = capacity
+  private def resize_to_capacity(capacity : Int)
+    @capacity = capacity.to_i
     if @buffer
-      @buffer = HeapAllocator(T).realloc @buffer, @capacity
+      @buffer = HeapAllocator(T).realloc @buffer, @capacity.to_u32
     else
       @buffer = Pointer(T).malloc @capacity.to_u64
     end
@@ -64,6 +81,7 @@ module ArrayTests
       init,
       init_capacity,
       push,
+      pop,
       index,
       index_assign,
     ]
@@ -93,6 +111,12 @@ module ArrayTests
     assert arr.@buffer
     assert_eq 24_u8, arr.@buffer[0]
     assert_eq 68_u8, arr.@buffer[1]
+  end
+
+  test pop, "Array#pop", begin
+    arr = Array(UInt8).new
+    arr.push 1_u8
+    assert_eq 1_u8, arr.pop
   end
 
   test index, "Array#[]", begin

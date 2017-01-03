@@ -28,6 +28,36 @@ struct Int
     unsafe_mod other
   end
 
+  def chr
+    unless 0 <= self <= Char::MAX_CODEPOINT
+      raise "Out of char range"
+    end
+    unsafe_chr
+  end
+
+  def divisible_by?(num : Int)
+    self % num == 0
+  end
+
+  def even?
+    divisible_by? 2
+  end
+
+  def odd?
+    !even?
+  end
+
+  def hash
+    self
+  end
+
+  def succ
+    self + 1
+  end
+
+  def pred
+    self - 1
+  end
   def times
     i = 0
     while i < self
