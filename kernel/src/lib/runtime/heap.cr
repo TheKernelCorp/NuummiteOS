@@ -199,7 +199,7 @@ module HeapTests
       heap_realloc,
     ]
   end
-  
+
   test heap_calloc, "Heap#calloc", begin
     panic_on_fail!
     ptr = HeapAllocator(UInt8).calloc
@@ -228,6 +228,7 @@ module HeapTests
     # This corrupts the heap
     # Heap.free ptr_a
     # Heap.free ptr_b
+
   end
 
   test heap_free, "Heap#free", begin

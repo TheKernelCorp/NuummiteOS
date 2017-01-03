@@ -54,7 +54,7 @@ end
 module Tests
   def self.run
     run_tests [
-      dev_serial
+      dev_serial,
     ]
   end
 

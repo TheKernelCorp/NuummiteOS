@@ -136,7 +136,7 @@ module StaticArrayTests
       static_array_ptr,
     ]
   end
-  
+
   test static_array, "StaticArray#[]/[]=", begin
     panic_on_fail!
     arr = uninitialized UInt8[2]

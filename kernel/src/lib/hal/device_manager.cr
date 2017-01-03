@@ -13,7 +13,7 @@ class DeviceManager
   def add_device(device : Device)
     @devices.push device
   end
-  
+
   def get_device(name : String) : Device?
     @devices.each do |dev|
       next unless dev

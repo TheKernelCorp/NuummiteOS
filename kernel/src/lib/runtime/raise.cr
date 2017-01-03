@@ -15,7 +15,7 @@ def raise(__file__ = __FILE__, __line__ = __LINE__) : NoReturn
   panic __file__, __line__
 end
 
-def raise (message : String, __file__ = __FILE__, __line__ = __LINE__) : NoReturn
+def raise(message : String, __file__ = __FILE__, __line__ = __LINE__) : NoReturn
   panic message, __file__, __line__
 end
 

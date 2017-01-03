@@ -25,7 +25,7 @@ def print(val : Int)
     '0', '1', '2', '3',
     '4', '5', '6', '7',
     '8', '9', 'A', 'B',
-    'C', 'D', 'E', 'F'
+    'C', 'D', 'E', 'F',
   ]
   while true
     arr[accum] = lut[(val % 16)].ord.to_u8

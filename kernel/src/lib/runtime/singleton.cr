@@ -1,12 +1,12 @@
 struct Singleton(T)
-    @value : T?
+  @value : T?
 
-    def get : T
-        value = @value
-        unless value
-            value = T.new
-            @value = value
-        end
-        value
+  def get : T
+    value = @value
+    unless value
+      value = T.new
+      @value = value
     end
+    value
+  end
 end

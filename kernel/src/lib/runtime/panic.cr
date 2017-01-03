@@ -16,7 +16,7 @@ private def panic_print_debug_information(__file__, __line__)
   puts __line__
 end
 
-private macro panic_halt_system : NoReturn
+private macro panic_halt_system
   asm("cli; hlt")
   while true; end
 end
