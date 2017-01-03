@@ -21,6 +21,8 @@ private EXCEPTION_MESSAGES = StaticArray [
     "SIMD floating-point exception",
 ]
 
+alias StackFrame = LibIDT::StackFrame
+
 lib LibIDT
     @[Packed]
     struct StackFrame
@@ -31,11 +33,26 @@ lib LibIDT
     end
 end
 
-alias InterruptHandler = LibIDT::StackFrame* -> Nil
+alias InterruptHandler = StackFrame -> Nil
 
 struct IDT
+    @@handlers = uninitialized Array(InterruptHandler)[16]
+
     def self.setup
         LibGlue.setup_idt
+    end
+
+    def self.setup_handlers
+        {% for i in 0...16 %}
+            @@handlers[{{ i }}] = Array(InterruptHandler).new
+        {% end %}
+    end
+
+    def self.add_handler(irq : Int, handler : InterruptHandler)
+        if irq < 0 || irq > 16
+            raise "Invalid IRQ number. Valid: [0..16]"
+        end
+        @@handlers[irq].push handler
     end
 
     @[AlwaysInline]
@@ -48,15 +65,26 @@ struct IDT
         asm("cli")
     end
 
-    def self.handle_isr(frame : LibIDT::StackFrame*)
-        if frame.value.intr < 0x20
+    def self.handle_isr(frame : LibIDT::StackFrame)
+        if frame.intr < 0x20
             self.handle_exception frame
+        elsif frame.intr >= 0x20 && frame.intr <= 0x2F
+            irq = frame.intr - 0x20
+            if @@handlers[irq].size != 0
+                i = 0
+                while i < @@handlers[irq].size
+                    callback = @@handlers[irq][i]
+                    callback.call frame
+                    i += 1
+                end
+            end
+        else
+            raise "Syscalls are not yet unsupported", "(Interrupt)", 0
         end
-        PIC.acknowledge frame.value.intr
+        PIC.acknowledge frame.intr
     end
 
-    def self.handle_exception(frame : LibIDT::StackFrame*)
-        frame = frame.value
+    def self.handle_exception(frame : LibIDT::StackFrame)
         if frame.intr < 0x14
             raise EXCEPTION_MESSAGES[frame.intr], "(Interrupt)", 0
         else

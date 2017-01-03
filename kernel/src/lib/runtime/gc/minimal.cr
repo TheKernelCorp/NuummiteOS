@@ -3,19 +3,17 @@
 
 fun __crystal_malloc(size : UInt32) : Void*
   block = Heap.kalloc(size).as Void*
-  panic if block.null?
+  raise "Allocated pointer is zero" unless block
   block
 end
 
 fun __crystal_malloc_atomic(size : UInt32) : Void*
-  block = Heap.kalloc(size).as Void*
-  panic if block.null?
-  block
+  __crystal_malloc size
 end
 
 # TODO: Implement
 fun __crystal_realloc(size : UInt32) : Void*
-  panic
+  raise "__crystal_realloc is not yet supported"
 end
 
 module GC
@@ -33,7 +31,7 @@ module GC
 
   # TODO: Implement
   def self.free(pointer : Void*)
-    panic
+    raise "GC.free is not yet supported"
   end
 
   def self.add_finalizer(object)

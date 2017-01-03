@@ -31,11 +31,12 @@ private lib LibHeap
 end
 
 struct Heap
+  @@heap : Heap = Heap.new 0_u32
   @@instance = Pointer(Heap).null
 
   def self.init(end_of_kernel : USize)
-    heap = Heap.new end_of_kernel
-    @@instance = pointerof(heap)
+    @@heap = Heap.new end_of_kernel
+    @@instance = pointerof(@@heap)
   end
 
   def initialize(end_of_kernel : USize)
@@ -47,19 +48,19 @@ struct Heap
 
   def self.calloc(size : USize) : UInt8*
     instance = @@instance
-    return Pointer(UInt8).null unless instance
+    raise "Unable to calloc memory" unless instance
     instance.value.calloc size
   end
 
   def self.kalloc(size : USize) : UInt8*
     instance = @@instance
-    return Pointer(UInt8).null unless instance
+    raise "Unable to kalloc memory" unless instance
     instance.value.kalloc size
   end
 
   def self.free(ptr : _*, __file__ = __FILE__, __line__ = __LINE__)
     instance = @@instance
-    return unless instance
+    raise "Unable to free memory" unless instance
     instance.value.free ptr, __file__, __line__
   end
 
@@ -73,13 +74,13 @@ struct Heap
 
   def self.addr : USize
     instance = @@instance
-    return 0u32 unless instance
+    raise "Unable to obtain heap address" unless instance
     instance.value.@free_addr.address.to_u32
   end
 
   def calloc(size : USize) : UInt8*
     block = alloc size
-    return Pointer(UInt8).null unless block
+    raise "Unable to calloc memory" unless block
     chunk = block.value.block_chunk.to_void_ptr
     memset chunk, 0_u8, block.value.block_size
     block.value.block_chunk
@@ -87,13 +88,13 @@ struct Heap
 
   def kalloc(size : USize) : UInt8*
     block = alloc size
-    return Pointer(UInt8).null unless block
+    raise "Unable to kalloc memory" unless block
     block.value.block_chunk
   end
 
-  private def alloc(size : USize) : Block* | Nil
+  private def alloc(size : USize) : Block*
     new_block = get_or_alloc_block size
-    return unless new_block
+    raise "Unable to alloc memory" unless new_block
     new_block.value.block_next = @used_top
     @used_top = new_block
     new_block
@@ -169,7 +170,8 @@ struct Heap
     end
   end
 
-  private def get_block_size(ptr : UInt8*) : USize
+  private def get_block_size(ptr : _*) : USize
+    ptr = ptr.to_void_ptr
     i = @used_top
     while i
       chunk = i.value.block_chunk

@@ -14,6 +14,7 @@ fun kearly(mboot_ptr : MultibootPointer)
   PIC.enable
   IDT.setup
   Heap.init 2_000_000_u32
+  IDT.setup_handlers
   init_devices
   run_self_tests
 end
@@ -29,8 +30,15 @@ fun kmain
   puts "Hello from Nuummite!"
   writeln ttys0, "Hello, world!"
   IDT.enable_interrupts
+  xaxaxa
   while true
   end
+end
+
+def xaxaxa
+  puts "This is supposed to print xaxaxa..."
+  IDT.add_handler 0, ->(frame : StackFrame) { print "x" }
+  IDT.add_handler 0, ->(frame : StackFrame) { print "a" }
 end
 
 def run_self_tests
