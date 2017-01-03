@@ -45,6 +45,7 @@ struct IDT
 
     @[AlwaysInline]
     def self.disable_interrupts
+        asm("cli")
     end
 
     def self.handle_isr(frame : LibIDT::StackFrame*)
