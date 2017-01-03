@@ -6,6 +6,6 @@ require "./glue"
 require "./macros"
 
 # Alpha-sorted list
+require "./runtime"
 require "./hal"
 require "./multiboot"
-require "./runtime"

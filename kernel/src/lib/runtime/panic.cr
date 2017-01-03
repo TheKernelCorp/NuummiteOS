@@ -1,24 +1,22 @@
-def panic(file = __FILE__, line = __LINE__) : NoReturn
-  puts "*** KERNEL PANIC"
-  panic_print_debug_information file, line
-  panic_halt_system
+def panic(__file__ = __FILE__, __line__ = __LINE__) : NoReturn
+  panic "No further information available.", __file__, __line__
 end
 
-def panic(message : String, file = __FILE__, line = __LINE__) : NoReturn
+def panic(message : String, __file__ = __FILE__, __line__ = __LINE__) : NoReturn
   print "*** KERNEL PANIC: "
   puts message
-  panic_print_debug_information file, line
+  panic_print_debug_information __file__, __line__
   panic_halt_system
 end
 
-private def panic_print_debug_information(file, line)
+private def panic_print_debug_information(__file__, __line__)
   print "*** File: "
-  puts file
+  puts __file__
   print "*** Line: "
-  puts line
+  puts __line__
 end
 
-private macro panic_halt_system
+private macro panic_halt_system : NoReturn
   asm("cli; hlt")
   while true; end
 end

@@ -28,14 +28,9 @@ end
 fun kmain
   puts "Hello from Nuummite!"
   writeln ttys0, "Hello, world!"
-  asm("sti")
-  #while true
-  #  print "x"
-  #  i = 0_u64
-  #  while i < 0xFFFF
-  #    i += 1
-  #  end
-  #end
+  IDT.enable_interrupts
+  while true
+  end
 end
 
 def run_self_tests

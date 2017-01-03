@@ -1,5 +1,5 @@
-fun glue_handle_isr
-    # IDT.handle_isr intr
+fun glue_handle_isr(frame : LibIDT::StackFrame*)
+    IDT.handle_isr frame
 end
 
 lib LibGlue
