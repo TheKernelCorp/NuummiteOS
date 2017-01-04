@@ -82,6 +82,10 @@ struct Keyboard
     end
   end
 
+  def self.key_available?
+    @@buffer.size != 0
+  end
+
   def self.read_key
     read_key { raise "No key available" }
   end
@@ -132,5 +136,8 @@ module KeyboardTests
     assert_eq 'c', Keyboard.read_key
     assert_eq 'b', Keyboard.read_key
     assert_eq 'a', Keyboard.read_key
+    while Keyboard.key_available?
+      Keyboard.read_key
+    end
   end
 end
