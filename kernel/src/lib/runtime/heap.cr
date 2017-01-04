@@ -102,7 +102,7 @@ struct Heap
 
   private def get_or_alloc_block(size : USize) : Block* | Nil
     block = get_block size
-    if !block
+    unless block
       block = alloc_block(sizeof(Block).to_u32).as Block*
       return unless block
       block.value.block_size = size
@@ -116,18 +116,19 @@ struct Heap
     aligned = guard_size + align size
     free_addr = @free_addr.as UInt32*
     free_addr.value = GUARD1
-    (free_addr + size + sizeof(UInt32)).value = GUARD2
-    ptr = @free_addr + sizeof(UInt32)
+    free_addr += 1
+    (free_addr + (size / sizeof(UInt32)) + 1).value = GUARD2
     @free_addr += aligned
-    ptr
+    free_addr.as UInt8*
   end
 
   def realloc(ptr : _*, size : USize) : UInt8*
-    block_size = get_block_size ptr
+    tmp = ptr
+    block_size = get_block_size tmp
     return Pointer(UInt8).null if block_size == 0
-    free ptr
+    free tmp
     new_ptr = kalloc size
-    memcpy new_ptr.to_void_ptr, ptr.to_void_ptr, block_size
+    memcpy new_ptr.to_void_ptr, tmp.to_void_ptr, block_size
     new_ptr
   end
 
@@ -137,8 +138,11 @@ struct Heap
     while i
       if i.value.block_chunk == ptr
         block = i.value.block_chunk.as UInt32*
-        unless (block - 1).value == GUARD1 && (block + (i.value.block_size / 4) + 4).value == GUARD2
-          panic "Heap corruption!", __file__, __line__
+        unless (block - 1).value == GUARD1
+          panic "Heap corruption: Failed to validate GUARD 1."
+        end
+        unless (block + (i.value.block_size / sizeof(UInt32)) + 1).value == GUARD2
+          panic "Heap corruption: Failed to validate GUARD 2."
         end
         if p == i
           @used_top = i.value.block_next
@@ -155,13 +159,13 @@ struct Heap
 
   private def get_block(size : USize) : Block* | Nil
     i = @free_top
-    p = @free_top
+    p = i
     while i
       if i.value.block_size <= size
         if p == i
           @free_top = i.value.block_next
         else
-          i.value.block_next = i.value.block_next
+          p.value.block_next = i.value.block_next
         end
         return i
       end
@@ -194,6 +198,7 @@ module HeapTests
       heap_calloc,
       heap_kalloc,
       heap_kalloc_diff,
+      heap_guard_integrity,
       heap_free,
       heap_free_alloc,
       heap_realloc,
@@ -218,17 +223,25 @@ module HeapTests
   test heap_kalloc_diff, "Heap#kalloc/diversity", begin
     panic_on_fail!
     ptr_a = HeapAllocator(UInt8).kalloc
-    assert ptr_a
     addr_a = Heap.addr
     ptr_b = HeapAllocator(UInt8).kalloc
-    assert ptr_b
     addr_b = Heap.addr
     assert_not_eq addr_a, addr_b
-    assert_not_eq ptr_a, ptr_b
-    # This corrupts the heap
-    # Heap.free ptr_a
-    # Heap.free ptr_b
+    # This still breaks stuff
+    #Heap.free ptr_a
+    #Heap.free ptr_b
+  end
 
+  test heap_guard_integrity, "Heap/guard_integrity", begin
+    panic_on_fail!
+    ptr_a = HeapAllocator(UInt32).kalloc
+    ptr_a.value = 0xFFFFFFFF_u32
+    ptr_b = HeapAllocator(UInt32).kalloc
+    ptr_b.value = 0xFFFFFFFF_u32
+    assert_eq GUARD1, (ptr_a - 1).value
+    assert_eq GUARD1, (ptr_b - 1).value
+    assert_eq GUARD2, (ptr_a + 2).value
+    assert_eq GUARD2, (ptr_b + 2).value
   end
 
   test heap_free, "Heap#free", begin

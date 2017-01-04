@@ -75,9 +75,8 @@ class LinkedList(T)
     if offset >= @count
       raise "Index out of range!"
     end
-    head = @head
     i = 0
-    node = head
+    node = @head
     while i < offset + 1
       next_node = node.next
       return unless next_node

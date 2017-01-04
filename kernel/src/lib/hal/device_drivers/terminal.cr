@@ -108,7 +108,7 @@ private struct TerminalDevice
 
   # Writes a `String` to the screen.
   def write(str : String)
-    str.@length.times do |i|
+    str.size.times do |i|
       write_byte pointerof(str.@c)[i]
     end
   end

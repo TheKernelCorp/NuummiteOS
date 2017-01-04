@@ -51,6 +51,7 @@ def run_self_tests
   LinkedListTests.run
   StaticArrayTests.run
   KeyboardTests.run
+  StringTests.run
   puts "FYI the kernel is still running."
 end
 

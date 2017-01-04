@@ -19,4 +19,8 @@ struct Range(B, E)
     yield current if !@exclusive && current == @end
     self
   end
+
+  def excludes_end?
+    @exclusive
+  end
 end

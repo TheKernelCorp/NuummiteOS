@@ -2,18 +2,15 @@
 # https://github.com/crystal-lang/crystal/blob/master/src/gc/null.cr
 
 fun __crystal_malloc(size : UInt32) : Void*
-  block = Heap.kalloc(size).as Void*
-  raise "Allocated pointer is zero" unless block
-  block
+  Heap.kalloc(size).to_void_ptr
 end
 
 fun __crystal_malloc_atomic(size : UInt32) : Void*
-  __crystal_malloc size
+  Heap.kalloc(size).to_void_ptr
 end
 
-# TODO: Implement
-fun __crystal_realloc(size : UInt32) : Void*
-  raise "__crystal_realloc is not yet supported"
+fun __crystal_realloc(ptr : Void*, size : UInt32) : Void*
+  Heap.realloc(ptr, size).to_void_ptr
 end
 
 module GC
@@ -29,7 +26,6 @@ module GC
   def self.disable
   end
 
-  # TODO: Implement
   def self.free(pointer : Void*)
     raise "GC.free is not yet supported"
   end
