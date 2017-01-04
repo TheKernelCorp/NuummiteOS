@@ -8,6 +8,10 @@ def print(val : Bool)
   Terminal.write val ? "true" : "false"
 end
 
+def print(val : Char)
+  Terminal.write_byte val.ord.to_u8
+end
+
 def print(val : Int)
   if val > 0xFFFFFFFF
     print val >> 0x20

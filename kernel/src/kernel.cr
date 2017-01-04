@@ -15,6 +15,7 @@ fun kearly(mboot_ptr : MultibootPointer)
   Heap.init 2_000_000_u32
   IDT.setup
   PIT.setup 100
+  Keyboard.init
   init_devices
   run_self_tests
   install_irq_handlers
@@ -29,6 +30,7 @@ end
 
 def install_irq_handlers
   IDT.add_handler 0, -> PIT.tick
+  IDT.add_handler 1, -> Keyboard.handle_keypress
 end
 
 fun kmain
@@ -44,8 +46,10 @@ def run_self_tests
   Tests.run
   HeapTests.run
   ArrayTests.run
+  DequeTests.run
   LinkedListTests.run
   StaticArrayTests.run
+  KeyboardTests.run
   puts "FYI the kernel is still running."
 end
 
