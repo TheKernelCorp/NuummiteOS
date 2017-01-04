@@ -38,6 +38,7 @@ fun kmain
   writeln ttys0, "Hello, world!"
   IDT.enable_interrupts
   while true
+    asm("hlt")
   end
 end
 
