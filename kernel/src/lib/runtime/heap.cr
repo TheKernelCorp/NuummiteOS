@@ -33,6 +33,8 @@ end
 struct Heap
   @@heap : Heap = Heap.new 0_u32
   @@instance = Pointer(Heap).null
+  @used_bytes_sys : UInt32
+  @used_bytes_real : UInt32
 
   def self.init(end_of_kernel : USize)
     @@heap = Heap.new end_of_kernel
@@ -44,6 +46,18 @@ struct Heap
     @used_top = Pointer(Block).null
     @free_top = Pointer(Block).null
     @free_addr = addr.as UInt8*
+    @used_bytes_sys = 0_u32
+    @used_bytes_real = 0_u32
+  end
+
+  def self.size_sys
+    instance = @@instance.value
+    instance.@used_bytes_sys
+  end
+
+  def self.size_real
+    instance = @@instance.value
+    instance.@used_bytes_real
   end
 
   def self.calloc(size : USize) : UInt8*
@@ -119,6 +133,8 @@ struct Heap
     free_addr += 1
     (free_addr + (size / sizeof(UInt32)) + 1).value = GUARD2
     @free_addr += aligned
+    @used_bytes_sys += guard_size + size # ignore alignment for now
+    @used_bytes_real += size
     free_addr.as UInt8*
   end
 
@@ -144,6 +160,8 @@ struct Heap
         unless (block + (i.value.block_size / sizeof(UInt32)) + 1).value == GUARD2
           panic "Heap corruption: Failed to validate GUARD 2."
         end
+        @used_bytes_sys -= i.value.block_size + (sizeof(UInt32) * 2) # ignore alignment for now
+        @used_bytes_real -= i.value.block_size
         if p == i
           @used_top = i.value.block_next
         else
