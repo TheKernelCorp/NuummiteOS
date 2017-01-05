@@ -18,8 +18,8 @@ An OS written in [Crystal][crystal_home] as a Proof of Concept.
 [crystal_home]: https://crystal-lang.org
 [crystal_compiler]: https://crystal-lang.org/docs/installation/index.html
 
-## Shell
+## Using the recovery shell
 
 - Shell username is: `root`
 - Shell password is: `1234`
-- Shell coammnds can be listed using `help`
+- Shell commands can be listed using `help`
