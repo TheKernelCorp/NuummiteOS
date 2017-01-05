@@ -21,8 +21,27 @@ class Array(T)
     end
   end
 
+  def self.new(size : Int, &block : Int32 -> T)
+    Array(T).build(size) do |buffer|
+      size.to_i.times do |i|
+        buffer[i] = yield i
+      end
+      size
+    end
+  end
+
+  def self.build(capacity : Int)
+    ary = Array(T).new capacity
+    ary.size = (yield ary.to_unsafe).to_i
+    ary
+  end
+
   def size
     @size
+  end
+
+  def to_unsafe : T*
+    @buffer
   end
 
   def push(value : T)
@@ -54,6 +73,10 @@ class Array(T)
   @[AlwaysInline]
   def unsafe_at(index : Int) : T
     @buffer[index]
+  end
+
+  protected def size=(size : Int)
+    @size = size.to_i
   end
 
   private def check_needs_resize
