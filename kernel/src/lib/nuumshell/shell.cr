@@ -3,7 +3,7 @@ require "./apps/*"
 class NuumShell
   def initialize
     @user = "root"
-    @pass = "root"
+    @pass = "1234"
     @login = false
     @max_login = 3
   end

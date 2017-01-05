@@ -17,3 +17,9 @@ An OS written in [Crystal][crystal_home] as a Proof of Concept.
 [cross_cc]: http://wiki.osdev.org/GCC_Cross-Compiler
 [crystal_home]: https://crystal-lang.org
 [crystal_compiler]: https://crystal-lang.org/docs/installation/index.html
+
+## Using the recovery shell
+
+- Shell username is: `root`
+- Shell password is: `1234`
+- Shell commands can be listed using `help`
