@@ -48,15 +48,13 @@ class NuumShell
   end
 
   def help
-    puts "Avilable commands:\r\n1) echo\r\n2) mem\r\n3) help"
-    # Waiting for Array Builder
-    # apps = ["mem", "echo"]
-    # puts "Avilable commands are"
-    # num = 1
-    # apps.each do |app|
-    #   puts "#{num}) #{app}"
-    #   num += 1
-    # end
+    apps = ["mem", "echo", "help"]
+    puts "Avilable commands are"
+    num = 1
+    apps.each do |app|
+      puts "#{num}) #{app}"
+      num += 1
+    end
   end
 
   def banner
