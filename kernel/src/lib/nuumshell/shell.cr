@@ -28,6 +28,8 @@ class NuumShell
         Mem.stats
       when "poweroff"
         Power.off
+      else
+        puts "Unrecognized command: #{command[0]}"
       end
     end
   end
