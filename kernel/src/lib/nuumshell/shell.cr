@@ -26,6 +26,8 @@ class NuumShell
         help
       when "mem"
         Mem.stats
+      when "poweroff"
+        Power.off
       end
     end
   end
@@ -51,7 +53,7 @@ class NuumShell
   end
 
   def help
-    apps = ["mem", "echo", "help"]
+    apps = ["mem", "echo", "help", "poweroff"]
     puts "Avilable commands are"
     num = 1
     apps.each do |app|
