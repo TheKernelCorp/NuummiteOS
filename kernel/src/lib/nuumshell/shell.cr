@@ -18,7 +18,9 @@ class NuumShell
       command = Keyboard.gets.chomp.split 2
       case command[0]
       when "echo"
-        Echo.echo(command[1])
+        if command.size > 1
+          Echo.echo(command[1])
+        end
       when "help"
         help
       when "mem"
