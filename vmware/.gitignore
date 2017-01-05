@@ -1,0 +1,7 @@
+*.nvram
+*.log
+*.vmdk.lck
+*.vmem
+*.vmem.lck
+*.vmsd
+*.vmxf
