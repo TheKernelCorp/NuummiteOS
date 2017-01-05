@@ -22,9 +22,9 @@ class String::Builder
   end
 
   def self.new(string : String)
-    builder = new string.bytesize
-    builder << string
-    builder
+    io = new string.bytesize
+    io << string
+    io
   end
 
   def read(slice : Bytes)

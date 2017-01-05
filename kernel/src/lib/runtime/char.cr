@@ -50,4 +50,18 @@ struct Char
   def hash
     ord
   end
+
+  def to_s
+    String.new(4) do |buffer|
+      appender = buffer.appender
+      each_byte { |byte| appender << byte }
+      {appender.size, 1}
+    end
+  end
+
+  def to_s(io : IO)
+    byte = ord.to_u8
+    # Only support ASCII characters
+    io.write_byte byte
+  end
 end

@@ -18,4 +18,11 @@ class Reference
   def hash
     object_id
   end
+
+  def to_s(io : IO) : Nil
+    io << "#<" << self.class.name << ":0x"
+    object_id.to_s 16, io
+    io << ">"
+    nil
+  end
 end

@@ -223,13 +223,11 @@ module HeapTests
   test heap_kalloc_diff, "Heap#kalloc/diversity", begin
     panic_on_fail!
     ptr_a = HeapAllocator(UInt8).kalloc
-    addr_a = Heap.addr
     ptr_b = HeapAllocator(UInt8).kalloc
-    addr_b = Heap.addr
-    assert_not_eq addr_a, addr_b
+    assert_not_eq ptr_a, ptr_b
     # This still breaks stuff
-    #Heap.free ptr_a
-    #Heap.free ptr_b
+    # Heap.free ptr_a
+    # Heap.free ptr_b
   end
 
   test heap_guard_integrity, "Heap/guard_integrity", begin

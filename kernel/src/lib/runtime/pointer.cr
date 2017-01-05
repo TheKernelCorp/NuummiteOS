@@ -71,6 +71,18 @@ struct Pointer(T)
     self.as Void*
   end
 
+  def to_s(io : IO)
+    io << "Pointer("
+    io << T.to_s
+    io << ")"
+    if address == 0
+      io << ".null"
+    else
+      io << "@0x"
+      address.to_s 16, io
+    end
+  end
+
   protected def copy_from_impl(source : Pointer(T), count : Int)
     raise "Negative count" if count < 0
     if self.class == source.class

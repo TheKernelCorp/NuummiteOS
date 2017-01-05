@@ -19,6 +19,14 @@ class Object
 
   # abstract def hash
 
+  def to_s
+    String.build do |io|
+      to_s io
+    end
+  end
+
+  # abstract def to_s(io : IO)
+
   def tap
     yield self
     self
