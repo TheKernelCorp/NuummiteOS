@@ -28,6 +28,8 @@ class NuumShell
         Mem.stats
       when "poweroff"
         Power.off
+      else
+        puts "Unrecognized command: #{command[0]}"
       end
     end
   end
@@ -54,7 +56,7 @@ class NuumShell
 
   def help
     apps = ["mem", "echo", "help", "poweroff"]
-    puts "Avilable commands are"
+    puts "Available commands are"
     num = 1
     apps.each do |app|
       puts "#{num}) #{app}"
