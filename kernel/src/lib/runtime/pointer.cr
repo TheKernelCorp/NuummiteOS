@@ -3,6 +3,33 @@ struct Pointer(T)
     new 0_u64
   end
 
+  def self.malloc(size : Int = 1)
+    if size < 0
+      raise ArgumentError.new "negative Pointer#malloc size"
+    end
+    Heap.kalloc size.to_u64
+  end
+
+  def self.malloc(size : Int, value : T)
+    ptr = Pointer(T).malloc size
+    size.times { |i| ptr[i] = value }
+    ptr
+  end
+
+  def self.malloc(size : Int, &block : Int32 -> T)
+    ptr = Pointer(T).malloc size
+    size.times { |i| ptr[i] = yield i }
+    ptr
+  end
+
+  def realloc(size : Int)
+    HeapAllocator(T).realloc self, size.to_u32
+  end
+
+  def memcmp(other : Pointer(T), count : Int)
+    ::memcmp self.to_void_ptr, other.to_void_ptr, (count * sizeof(T)).to_u32
+  end
+
   def +(other : Int)
     self + other.to_i64
   end
@@ -71,6 +98,10 @@ struct Pointer(T)
     self.as Void*
   end
 
+  def to_slice(size)
+    Slice.new self, size
+  end
+
   def to_s(io : IO)
     io << "Pointer("
     io << T.to_s
@@ -83,7 +114,11 @@ struct Pointer(T)
     end
   end
 
-  protected def copy_from_impl(source : Pointer(T), count : Int)
+  def appender
+    Pointer::Appender.new(self)
+  end
+
+  protected def copy_from_impl(source : T*, count : Int)
     raise "Negative count" if count < 0
     if self.class == source.class
       memcpy self.to_void_ptr, source.to_void_ptr, (count * sizeof(T)).to_u32
@@ -93,5 +128,24 @@ struct Pointer(T)
       end
     end
     self
+  end
+
+  struct Appender(T)
+    def initialize(@pointer : T*)
+      @start = @pointer
+    end
+
+    def <<(value : T)
+      @pointer.value = value
+      @pointer += 1
+    end
+
+    def size
+      @pointer - @start
+    end
+
+    def pointer
+      @pointer
+    end
   end
 end

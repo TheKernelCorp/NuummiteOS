@@ -47,6 +47,10 @@ struct Char
     ord < 0x20 || (0x7F <= ord <= 0x9F)
   end
 
+  def bytesize
+    1 # The byte size is always one byte
+  end
+
   def hash
     ord
   end
@@ -63,5 +67,10 @@ struct Char
     byte = ord.to_u8
     # Only support ASCII characters
     io.write_byte byte
+  end
+
+  def each_byte
+    c = ord
+    yield c.to_u8
   end
 end
