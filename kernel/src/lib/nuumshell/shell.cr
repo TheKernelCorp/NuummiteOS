@@ -16,6 +16,7 @@ class NuumShell
     loop do
       print "\n#{@user}@nuumsh#: "
       command = Keyboard.gets.chomp.split 2
+      next unless command.size > 0
       case command[0]
       when "echo"
         if command.size > 1
