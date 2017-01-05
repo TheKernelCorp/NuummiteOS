@@ -10,7 +10,7 @@ export MAKE:=$(MAKE:-make)
 
 export NASM:=nasm
 export CC:=$(HOST)-gcc
-export LD:=$(HOST)-ld
+export LD:=$(HOST)-gcc
 
 export NASMFLAGS:=-felf32
 

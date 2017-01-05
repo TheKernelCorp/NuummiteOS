@@ -1,6 +1,6 @@
-TARGET?=i386-unknown-chronos-gnu
+TARGET?=i386-unknown-nuummite-gnu
 CRYSTAL_FLAGS?=--emit obj --cross-compile --target "$(TARGET)" --prelude=empty
-LDFLAGS?=-m elf_i386
+LDFLAGS?=-ffreestanding -nostdlib -n
 NASMFLAGS?=
 
 DESTDIR?=
@@ -27,7 +27,7 @@ all: nuummite.kern
 .PHONY: all nuummite.kern install install-kern clean
 
 nuummite.kern: $(OBJ_LINK) $(ARCHDIR)/linker.ld
-	$(LD) -T $(ARCHDIR)/linker.ld -o $@ $(OBJ_LINK) $(LDFLAGS)
+	$(LD) -T $(ARCHDIR)/linker.ld -o $@ $(OBJ_LINK) $(LDFLAGS) -lgcc
 
 %.o: %.cr
 	crystal build $(CRYSTAL_FLAGS) $< -o $(shell echo $@ | cut -f 1 -d '.')
