@@ -15,9 +15,14 @@ class NuumShell
     end
     loop do
       print "\n#{@user}@nuumsh#: "
-      command = Keyboard.gets.chomp
-      if command.starts_with?("echo")
-        Echo.echo(command)
+      command = Keyboard.gets.chomp.split 2
+      case command[0]
+      when "echo"
+        Echo.echo(command[1])
+      when "help"
+        help
+      when "mem"
+        Mem.stats
       end
     end
   end
@@ -34,12 +39,24 @@ class NuumShell
         break
       end
       puts "User or password are incorrect"
-      try = +1
+      try += 1
       if try > @max_login
         puts "Maximum tries for login reached"
         break
       end
     end
+  end
+
+  def help
+    puts "Avilable commands:\r\n1) echo\r\n2) mem\r\n3) help"
+    # Waiting for Array Builder
+    # apps = ["mem", "echo"]
+    # puts "Avilable commands are"
+    # num = 1
+    # apps.each do |app|
+    #   puts "#{num}) #{app}"
+    #   num += 1
+    # end
   end
 
   def banner
