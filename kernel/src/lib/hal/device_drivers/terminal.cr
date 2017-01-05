@@ -24,6 +24,10 @@ private struct TerminalDevice
     @color = TerminalHelper.make_color 0x08_u8, 0x00_u8
   end
 
+  def set_color(fc : UInt8, bc : UInt8)
+    @color = TerminalHelper.make_color fc, bc
+  end
+
   # Writes an `UInt8` to the screen.
   def write_byte(b : UInt8)
     case b

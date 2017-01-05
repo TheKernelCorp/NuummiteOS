@@ -34,12 +34,38 @@ def install_irq_handlers
 end
 
 fun kmain
-  puts "Hello from Nuummite!"
+  print_color_thing
+  # Say hello to tty-serial-0
   writeln ttys0, "Hello, world!"
+  # Get down to business
   IDT.enable_interrupts
   while true
-    asm("hlt")
+    # Echo!
+    print "kecho> "
+    puts "kecho: #{Keyboard.gets}"
   end
+end
+
+def print_color_thing
+  # The following is a mess
+  # But it's a beautiful mess
+  print "Hello from "
+  Terminal.set_color 0xA_u8, 0x0_u8
+  print "N"
+  Terminal.set_color 0xB_u8, 0x0_u8
+  print "u"
+  print "u"
+  Terminal.set_color 0xC_u8, 0x0_u8
+  print "m"
+  print "m"
+  Terminal.set_color 0xD_u8, 0x0_u8
+  print "i"
+  Terminal.set_color 0xE_u8, 0x0_u8
+  print "t"
+  Terminal.set_color 0xF_u8, 0x0_u8
+  print "e"
+  Terminal.set_color 0x8_u8, 0x0_u8
+  puts "!"
 end
 
 def run_self_tests

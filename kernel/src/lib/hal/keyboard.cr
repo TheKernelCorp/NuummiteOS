@@ -82,6 +82,25 @@ struct Keyboard
     end
   end
 
+  def self.getc(silent = false) : Char
+    until Keyboard.key_available?; end
+    key = Keyboard.read_key
+    print key unless silent
+    key
+  end
+
+  def self.gets(silent = false) : String
+    String.build { |str|
+      while true
+        next unless Keyboard.key_available?
+        key = Keyboard.read_key
+        print key unless silent
+        break if key == '\n'
+        str << key
+      end
+    }
+  end
+
   def self.key_available?
     @@buffer.size != 0
   end
