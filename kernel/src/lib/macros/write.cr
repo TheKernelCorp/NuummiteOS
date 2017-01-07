@@ -16,3 +16,8 @@ macro writeln!(data)
   write! {{ data }}
   write! "\r\n"
 end
+
+macro ioctl(device, code, data)
+  %device = DeviceManager.get_device {{ device.stringify }}
+  %device.ioctl({{ code }}, {{ data }})
+end

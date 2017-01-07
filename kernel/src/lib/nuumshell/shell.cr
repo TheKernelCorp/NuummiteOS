@@ -13,6 +13,7 @@ class NuumShell
     until @login
       login
     end
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0F
     loop do
       prompt = "#{@user}@Nuummite:/# "
       line, command, args = read_command prompt
@@ -51,7 +52,7 @@ class NuumShell
   end
 
   def help
-    apps = ["mem", "echo", "help", "poweroff"]
+    apps = ["help", "echo", "mem", "shutdown"]
     puts "Available commands are"
     num = 1
     apps.each do |app|
@@ -64,21 +65,21 @@ class NuumShell
     # The following is a mess
     # But it's a beautiful mess
     print "Hello from "
-    #Terminal.set_color 0xA_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0A
     print "N"
-    #Terminal.set_color 0xB_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0B
     print "u"
     print "u"
-    #Terminal.set_color 0xC_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0C
     print "m"
     print "m"
-    #Terminal.set_color 0xD_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0D
     print "i"
-    #Terminal.set_color 0xE_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0E
     print "t"
-    #Terminal.set_color 0xF_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0F
     print "e"
-    #Terminal.set_color 0x8_u8, 0x0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x08
     puts "!"
   end
 

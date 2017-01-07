@@ -43,7 +43,6 @@ fun kmain
 end
 
 def run_self_tests
-  puts "Testing kernel integrity..."
   HeapTests.run
   ArrayTests.run
   DequeTests.run
@@ -51,5 +50,4 @@ def run_self_tests
   StaticArrayTests.run
   KeyboardTests.run
   StringTests.run
-  puts "FYI the kernel is still running."
 end

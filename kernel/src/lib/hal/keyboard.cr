@@ -99,6 +99,11 @@ module Keyboard
   end
 
   def gets(silent = false) : String
+    cursor_enabled = false
+    ioctl tty0, TerminalDevice::IOControl::CURSOR_GET_STATUS, pointerof(cursor_enabled)
+    if silent
+      ioctl tty0, TerminalDevice::IOControl::CURSOR_SET_STATUS, false
+    end
     String.build { |str|
       while true
         until Keyboard.key_available?
@@ -116,6 +121,7 @@ module Keyboard
         end
         print key unless silent || str.@bytesize == 0 
       end
+      ioctl tty0, TerminalDevice::IOControl::CURSOR_SET_STATUS, cursor_enabled
     }
   end
 

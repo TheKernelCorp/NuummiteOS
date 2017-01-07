@@ -9,6 +9,8 @@ abstract class Device
   end
 
   abstract def write_byte(b : UInt8)
+  abstract def read_byte : UInt8
+  abstract def ioctl(code : Enum, data)
 
   def write_string(str : String)
     if @type == DeviceType::BlockDevice

@@ -20,6 +20,13 @@ class SerialDevice < Device
     outb @port, b
   end
 
+  def read_byte : UInt8
+    raise "Reading is not supported for this device"
+  end
+
+  def ioctl(code : Enum, data)
+  end
+
   private def await_ready_state
     while inb(@port + 0x05) & 0x20 == 0
     end

@@ -14,6 +14,22 @@ def puts(val = nil)
 end
 
 class TerminalDevice < Device
+  # I/O Control
+  enum IOControl : UInt32
+    # Get color
+    # Data: UInt8*
+    COLOR_GET = 1 << 1
+    # Set color
+    # Data : UInt8
+    COLOR_SET = COLOR_GET | 1
+    # Get cursor status
+    # Data : Bool*
+    CURSOR_GET_STATUS = 1 << 2
+    # Set cursor status
+    # Data : Bool
+    CURSOR_SET_STATUS = CURSOR_GET_STATUS | 1
+  end
+
   # Constants
   private TAB_SIZE = 4
   private VGA_WIDTH = 80
@@ -47,24 +63,45 @@ class TerminalDevice < Device
     when '\t'.ord
       spaces = TAB_SIZE - (@x % TAB_SIZE)
       spaces.times { write_byte BLANK }
-    when 0x08
-      case @x
-      when 0
+    when 0x08 # backspace
+      if @x == 0
         @y = @y > 0 ? @y - 1 : 0
         @x = VGA_WIDTH - 1
-      else @x -= 1
+      else
+        @x -= 1
       end
       attr = TerminalHelper.make_attribute BLANK, @color
       @vmem[offset @x, @y] = attr
     else
-      if @x >= VGA_WIDTH
-        newline
-      end
       attr = TerminalHelper.make_attribute b, @color
       @vmem[offset @x, @y] = attr
       @x += 1
     end
+    if @x >= VGA_WIDTH
+      newline
+    end
     update_cursor @x, @y
+  end
+
+  def read_byte : UInt8
+    raise "Reading is not supported for this device"
+  end
+
+  def ioctl(code : Enum, data = nil)
+    case code
+    when IOControl::COLOR_GET
+      raise "Invalid data" unless data.is_a? Int8*
+      data.value = @color
+    when IOControl::COLOR_SET
+      raise "Invalid data" unless data.is_a? Int
+      @color = data.to_u8
+    when IOControl::CURSOR_GET_STATUS
+      raise "Invalid data" unless data.is_a? Bool*
+      data.value = @use_cursor
+    when IOControl::CURSOR_SET_STATUS
+      raise "Invalid data" unless data.is_a? Bool
+      data ? enable_cursor : disable_cursor
+    end
   end
 
   # Begins a new line.
