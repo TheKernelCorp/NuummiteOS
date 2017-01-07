@@ -27,7 +27,7 @@ struct Pointer(T)
   end
 
   def memcmp(other : Pointer(T), count : Int)
-    ::memcmp self.to_void_ptr, other.to_void_ptr, (count * sizeof(T)).to_u32
+    LibC.memcmp self, other, (count * sizeof(T)).to_u32
   end
 
   def +(other : Int)
@@ -83,7 +83,7 @@ struct Pointer(T)
   end
 
   def clear(count = 1)
-    memset self.to_void_ptr, 0_u8, (count * sizeof(T)).to_u32
+    LibC.memset self, 0_u8, (count * sizeof(T)).to_u32
   end
 
   def null?
@@ -121,7 +121,7 @@ struct Pointer(T)
   protected def copy_from_impl(source : T*, count : Int)
     raise "Negative count" if count < 0
     if self.class == source.class
-      memcpy self.to_void_ptr, source.to_void_ptr, (count * sizeof(T)).to_u32
+      LibC.memcpy self, source, (count * sizeof(T)).to_u32
     else
       while (count -= 1) >= 0
         self[count] = source[count]

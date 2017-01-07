@@ -94,7 +94,7 @@ struct Heap
     block = alloc size
     raise "Unable to calloc memory" unless block
     chunk = block.value.block_chunk.to_void_ptr
-    memset chunk, 0_u8, block.value.block_size
+    LibC.memset chunk, 0_u8, block.value.block_size
     block.value.block_chunk
   end
 
@@ -142,7 +142,7 @@ struct Heap
     return Pointer(UInt8).null if block_size == 0
     free tmp
     new_ptr = kalloc size
-    memcpy new_ptr.to_void_ptr, tmp.to_void_ptr, block_size
+    LibC.memcpy new_ptr, tmp, block_size
     new_ptr
   end
 
