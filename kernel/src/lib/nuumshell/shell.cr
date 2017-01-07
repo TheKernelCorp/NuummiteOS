@@ -1,4 +1,4 @@
-require "./apps/*"
+require "./builtins"
 
 class NuumShell
   def initialize
@@ -10,26 +10,24 @@ class NuumShell
 
   def run
     banner
-    while !@login
+    until @login
       login
     end
     loop do
-      print "\n#{@user}@nuumsh#: "
-      command = Keyboard.gets.chomp.split 2
-      next unless command.size > 0
-      case command[0]
-      when "echo"
-        if command.size > 1
-          Echo.echo(command[1])
-        end
+      prompt = "#{@user}@Nuummite:/# "
+      line, command, args = read_command prompt
+      next unless command
+      case command
       when "help"
         help
+      when "echo"
+        Builtins.echo args
       when "mem"
-        Mem.stats
-      when "poweroff"
-        Power.off
+        Builtins.mem args
+      when "shutdown"
+        Builtins.shutdown args
       else
-        puts "Unrecognized command: #{command[0]}"
+        puts "#{command}: command not found"
       end
     end
   end
@@ -37,10 +35,8 @@ class NuumShell
   def login
     try = 0
     loop do
-      print "Login: "
-      user = Keyboard.gets.chomp
-      print "Password: "
-      pass = Keyboard.gets(:silent).chomp
+      user = Keyboard.gets("Username: ").chomp
+      pass = Keyboard.gets("Password: ", :silent).chomp
       if pass == @pass && user == @user
         @login = true
         break
@@ -84,5 +80,13 @@ class NuumShell
     print "e"
     Terminal.set_color 0x8_u8, 0x0_u8
     puts "!"
+  end
+
+  private def read_command(prompt : String) : {String, String?, Array(String)}
+    line = Keyboard.gets(prompt).chomp
+    arr = line.split
+    com = arr[0].chomp(',') unless arr.empty?
+    args = arr[1..(arr.size-1)] unless arr.size < 2
+    { line, com, args || Array(String).new }
   end
 end
