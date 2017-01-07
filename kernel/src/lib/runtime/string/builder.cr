@@ -27,6 +27,13 @@ class String::Builder
     io
   end
 
+  def shrink!(amount : Int)
+    if bytesize >= amount
+      @bytesize -= amount
+    end
+    self
+  end
+
   def read(slice : Bytes)
     raise "Not implemented"
   end

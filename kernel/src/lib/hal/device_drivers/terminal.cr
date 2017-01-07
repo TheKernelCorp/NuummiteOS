@@ -23,20 +23,19 @@ class TerminalDevice < Device
 
   # Initializes the `Terminal`.
   def initialize(name : String, rescue_term = false)
+    fc, bc = { 0x8_u8, 0x0_u8 }
+    @use_cursor = true
     if rescue_term
       @name = name
       @type = DeviceType::CharDevice
+      disable_cursor
+      fc = 0xC_u8
     else
       super(name, DeviceType::CharDevice)
     end
     @x = 0
     @y = 0
     @vmem = Pointer(UInt16).new 0xB8000_u64
-    fc, bc = { rescue_term ? 0xC_u8 : 0x8_u8, 0x0_u8 }
-    @color = TerminalHelper.make_color fc, bc
-  end
-
-  def set_color(fc : UInt8, bc : UInt8)
     @color = TerminalHelper.make_color fc, bc
   end
 
@@ -49,16 +48,14 @@ class TerminalDevice < Device
       spaces = TAB_SIZE - (@x % TAB_SIZE)
       spaces.times { write_byte BLANK }
     when 0x08
-      attr = TerminalHelper.make_attribute BLANK, @color
-      if @y != 0
-        @vmem[offset @x, @y] = attr
-        case @x
-        when 0
-          @y = @y > 0 ? @y - 1 : 0
-          @x = VGA_WIDTH - 1
-        else @x -= 1
-        end
+      case @x
+      when 0
+        @y = @y > 0 ? @y - 1 : 0
+        @x = VGA_WIDTH - 1
+      else @x -= 1
       end
+      attr = TerminalHelper.make_attribute BLANK, @color
+      @vmem[offset @x, @y] = attr
     else
       if @x >= VGA_WIDTH
         newline
@@ -67,10 +64,11 @@ class TerminalDevice < Device
       @vmem[offset @x, @y] = attr
       @x += 1
     end
+    update_cursor @x, @y
   end
 
   # Begins a new line.
-  def newline
+  private def newline
     @x = 0
     if @y < VGA_HEIGHT - 1
       @y += 1
@@ -80,9 +78,30 @@ class TerminalDevice < Device
   end
 
   # Clears the screen.
-  def clear
+  private def clear
     attr = TerminalHelper.make_attribute BLANK, @color
     VGA_SIZE.times { |i| @vmem[i] = attr }
+  end
+
+  # Disables the hardware cursor.
+  private def disable_cursor
+    update_cursor 0, VGA_HEIGHT + 1
+    @use_cursor = false
+  end
+
+  # Enables the hardware cursor.
+  private def enable_cursor
+    @use_cursor = true
+    update_cursor @x, @y
+  end
+
+  private def update_cursor(x : Int, y : Int)
+    return unless @use_cursor
+    pos = offset x, y
+    outb 0x3D4_u16, 0x0F_u8
+    outb 0x3D5_u16, pos.to_u8
+    outb 0x3D4_u16, 0x0E_u8
+    outb 0x3D5_u16, (pos >> 8).to_u8
   end
 
   # Scrolls the terminal.

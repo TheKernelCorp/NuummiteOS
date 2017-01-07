@@ -105,9 +105,16 @@ module Keyboard
           asm("hlt")
         end
         key = Keyboard.read_key
-        print key unless silent && key != '\n'
-        break if key == '\n'
-        str << key
+        if key == '\n'
+          print key
+          break
+        end
+        if key.ord == 0x8 # backspace
+          str = str.shrink! 1
+        else
+          str << key
+        end
+        print key unless silent || str.@bytesize == 0 
       end
     }
   end
