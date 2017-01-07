@@ -1,18 +1,19 @@
-Terminal = TerminalDevice.new
+RESCUE_TERM = TerminalDevice.new("__NU_RESCUE_TTY", true)
 
 def print(val)
-  Terminal.write "#{val}"
+  return unless val
+  write tty0, "#{val}"
 end
 
 def puts(val = nil)
-  unless val.nil?
-    print "#{val}\n"
+  if val.is_a? Nil
+    write tty0, "\r\n"
   else
-    print "\n"
+    write tty0, "#{val}\r\n"
   end
 end
 
-private struct TerminalDevice
+class TerminalDevice < Device
   # Constants
   private TAB_SIZE = 4
   private VGA_WIDTH = 80
@@ -21,11 +22,18 @@ private struct TerminalDevice
   private BLANK = ' '.ord.to_u8
 
   # Initializes the `Terminal`.
-  def initialize
+  def initialize(name : String, rescue_term = false)
+    if rescue_term
+      @name = name
+      @type = DeviceType::CharDevice
+    else
+      super(name, DeviceType::CharDevice)
+    end
     @x = 0
     @y = 0
     @vmem = Pointer(UInt16).new 0xB8000_u64
-    @color = TerminalHelper.make_color 0x08_u8, 0x00_u8
+    fc, bc = { rescue_term ? 0xC_u8 : 0x8_u8, 0x0_u8 }
+    @color = TerminalHelper.make_color fc, bc
   end
 
   def set_color(fc : UInt8, bc : UInt8)
@@ -58,13 +66,6 @@ private struct TerminalDevice
       attr = TerminalHelper.make_attribute b, @color
       @vmem[offset @x, @y] = attr
       @x += 1
-    end
-  end
-
-  # Writes a `String` to the screen.
-  def write(str : String)
-    str.size.times do |i|
-      write_byte pointerof(str.@c)[i]
     end
   end
 

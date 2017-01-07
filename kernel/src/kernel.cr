@@ -23,6 +23,7 @@ fun kearly(mboot_ptr : MultibootPointer)
 end
 
 def init_devices
+  TerminalDevice.new "tty0"
   SerialDevice.new SERIAL_PORT_0, "ttys0"
   SerialDevice.new SERIAL_PORT_1, "ttys1"
   SerialDevice.new SERIAL_PORT_2, "ttys2"
@@ -43,7 +44,6 @@ end
 
 def run_self_tests
   puts "Testing kernel integrity..."
-  Tests.run
   HeapTests.run
   ArrayTests.run
   DequeTests.run
@@ -52,17 +52,4 @@ def run_self_tests
   KeyboardTests.run
   StringTests.run
   puts "FYI the kernel is still running."
-end
-
-module Tests
-  def self.run
-    run_tests [
-      dev_serial,
-    ]
-  end
-
-  test dev_serial, "Device#serial", begin
-    serial = DeviceManager.get_device("ttys0")
-    assert serial
-  end
 end

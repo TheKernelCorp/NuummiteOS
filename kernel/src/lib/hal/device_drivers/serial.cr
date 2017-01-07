@@ -3,7 +3,7 @@ SERIAL_PORT_1 = 0x02F8_u16
 SERIAL_PORT_2 = 0x03E8_u16
 SERIAL_PORT_3 = 0x02E8_u16
 
-struct SerialDevice < Device
+class SerialDevice < Device
   def initialize(@port : UInt16, name : String)
     super(name, DeviceType::CharDevice)
     outb @port + 0x01_u16, 0x00_u8

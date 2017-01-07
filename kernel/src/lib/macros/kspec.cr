@@ -44,9 +44,9 @@ macro assert_not_eq(a, b)
 end
 
 macro __test_fail(expected, actual)
-  puts "[Test] FAIL #{__test_name}"
-  puts "-----> Expect: #{{{ expected }}}"
-  puts "-----> Actual: #{{{ actual }}}"
+  writeln! "[Test] FAIL #{__test_name}"
+  writeln! "-----> Expect: #{{{ expected }}}"
+  writeln! "-----> Actual: #{{{ actual }}}"
   if __test_panic_on_fail
     panic "Critical test failed", __test_file, __test_line
   end

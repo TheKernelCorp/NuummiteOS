@@ -6,7 +6,11 @@ class DeviceManager
     @@instance.get.add_device device
   end
 
-  def self.get_device(name : String) : Device?
+  def self.get_device?(name : String) : Device?
+    @@instance.get.get_device? name
+  end
+
+  def self.get_device(name : String) : Device
     @@instance.get.get_device name
   end
 
@@ -14,10 +18,19 @@ class DeviceManager
     @devices.push device
   end
 
-  def get_device(name : String) : Device?
-    @devices.each do |dev|
+  def get_device?(name : String) : Device?
+    get_device(name) { nil }
+  end
+
+  def get_device(name : String) : Device
+    get_device(name) { raise "Device not found" }
+  end
+
+  def get_device(name : String)
+    @devices.each { |dev|
       next unless dev
       return dev if dev.@name == name
-    end
+    }
+    yield
   end
 end
