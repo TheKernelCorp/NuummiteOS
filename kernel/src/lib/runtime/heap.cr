@@ -51,13 +51,11 @@ struct Heap
   end
 
   def self.size_sys
-    instance = @@instance.value
-    instance.@used_bytes_sys
+    @@instance.value.@used_bytes_sys
   end
 
   def self.size_real
-    instance = @@instance.value
-    instance.@used_bytes_real
+    @@instance.value.@used_bytes_real
   end
 
   def self.calloc(size : USize) : UInt8*

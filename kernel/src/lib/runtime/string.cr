@@ -30,9 +30,9 @@ class String
     end
     buffer[bytesize] = 0_u8
     if bytesize < capacity
-      str = HeapAllocator(UInt8).realloc str, bytesize.to_u32 + HEADER_SIZE + 1
+      str = str.realloc bytesize.to_u32 + HEADER_SIZE + 1
     end
-    str_header = str.as({Int32, Int32, Int32}*)
+    str_header = str.as {Int32, Int32, Int32}*
     str_header.value = {TYPE_ID, bytesize.to_i, size.to_i}
     str.as String
   end

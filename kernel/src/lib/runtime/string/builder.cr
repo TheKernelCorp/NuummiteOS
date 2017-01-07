@@ -73,6 +73,6 @@ class String::Builder
 
   private def resize_to_capacity(capacity)
     @capacity = capacity
-    @buffer = HeapAllocator(UInt8).realloc @buffer, @capacity.to_u32
+    @buffer = @buffer.realloc @capacity
   end
 end

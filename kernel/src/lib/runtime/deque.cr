@@ -12,15 +12,31 @@ class Deque(T)
 
   def initialize(capacity : Int)
     if capacity < 0
-      raise "Negative deque capacity!"
+      raise ArgumentError.new "Negative deque capacity: #{capacity}"
     end
     @size = 0
     @capacity = capacity.to_i
-    if capacity == 0
+    if @capacity == 0
       @buffer = Pointer(T).null
     else
-      @buffer = Pointer(T).malloc capacity.to_u64
+      @buffer = Pointer(T).malloc @capacity
     end
+  end
+
+  def self.new(size : Int, &block : Int32 -> T)
+    if size < 0
+      raise ArgumentError.new "Negative deque size: #{size}"
+    end
+    deque = Deque(T).new size
+    deque.size = size
+    size.to_i.times do |i|
+      deque.buffer[i] = yield i
+    end
+    deque
+  end
+
+  def self.new(array : Array(T))
+    Deque(T).new(array.size) { |i| array[i] }
   end
 
   def ==(other : Deque)
@@ -37,8 +53,8 @@ class Deque(T)
 
   def []=(index : Int, value : T)
     index += @size if index < 0
-    unless 0 <= index <= @size
-      raise "Invalid index!" # IndexError.new
+    unless 0 <= index < @size
+      raise IndexError.new
     end
     index += @start
     index -= @capacity if index >= @capacity
@@ -96,7 +112,7 @@ class Deque(T)
   end
 
   def pop
-    pop { raise "Invalid index!" } # IndexError.new
+    pop { raise IndexError.new }
   end
 
   def pop
@@ -117,7 +133,7 @@ class Deque(T)
   end
 
   def shift
-    shift { raise "Invalid index!" } # IndexError.new
+    shift { raise IndexError.new }
   end
 
   def shift

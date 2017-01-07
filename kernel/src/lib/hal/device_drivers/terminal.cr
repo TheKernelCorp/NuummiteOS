@@ -42,7 +42,7 @@ private struct TerminalDevice
         @vmem[offset @x, @y] = attr
         case @x
         when 0
-          @y -= 1
+          @y = @y > 0 ? @y - 1 : 0
           @x = VGA_WIDTH - 1
         else @x -= 1
         end

@@ -26,7 +26,9 @@ private KBD_COM_MK_SINGLE = 0xFD_u16
 private KBD_COM_RESEND = 0xFE_u16
 private KBD_COM_SELF_TEST = 0xFF_u16
 
-struct Keyboard
+module Keyboard
+  extend self
+
   @@shift : Bool?
   @@buffer = Deque(Char).new 256
 
@@ -39,7 +41,7 @@ struct Keyboard
   # - Clears the LEDs
   # - Sets the fastest possible refresh-rate
   # - Enables keycode scanning
-  def self.init
+  def init
     # Clear LEDs
     send_command KBD_COM_LED
     send_command 0x00
@@ -47,20 +49,20 @@ struct Keyboard
     send_command KBD_COM_TYPEMATIC
     send_command 0x00
     # Enable keyboard
-    self.enable
+    enable
   end
 
   # Enables the keyboard
-  def self.enable
+  def enable
     send_command KBD_COM_SCAN_ON
   end
 
   # Disables the keyboard
-  def self.disable
+  def disable
     send_command KBD_COM_SCAN_OFF
   end
 
-  def self.handle_keypress
+  def handle_keypress
     data = inb KBD_DATA
     pressed = (data & 0x80) == 0
     if pressed # Key pressed
@@ -76,13 +78,13 @@ struct Keyboard
         data += 128
       end
       @@shift = false
-      key = pointerof(KEYMAP_EN_US.@c)[data].chr
-      self.buffer_key key
+      key = KEYMAP_EN_US[data]
+      buffer_key key
     else # Key released
     end
   end
 
-  def self.getc(silent = false) : Char
+  def getc(silent = false) : Char
     until Keyboard.key_available?
       asm("hlt")
     end
@@ -91,7 +93,7 @@ struct Keyboard
     key
   end
 
-  def self.gets(silent = false) : String
+  def gets(silent = false) : String
     String.build { |str|
       while true
         until Keyboard.key_available?
@@ -105,19 +107,19 @@ struct Keyboard
     }
   end
 
-  def self.key_available?
+  def key_available?
     @@buffer.size != 0
   end
 
-  def self.read_key
+  def read_key
     read_key { raise "No key available" }
   end
 
-  def self.read_key?
+  def read_key?
     read_key { nil }
   end
 
-  def self.read_key
+  def read_key
     if @@buffer.size == 0
       yield
     else
@@ -125,7 +127,7 @@ struct Keyboard
     end
   end
 
-  def self.buffer_key(key : Char)
+  def buffer_key(key : Char)
     if @@buffer.size < 256
       @@buffer.push key
     else

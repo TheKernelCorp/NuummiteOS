@@ -7,7 +7,7 @@ struct Pointer(T)
     if size < 0
       raise ArgumentError.new "negative Pointer#malloc size"
     end
-    Heap.kalloc size.to_u64
+    Heap.kalloc(size.to_u32).as T*
   end
 
   def self.malloc(size : Int, value : T)
