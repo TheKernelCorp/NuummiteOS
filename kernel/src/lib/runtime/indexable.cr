@@ -21,7 +21,7 @@ module Indexable(T)
 
   @[AlwaysInline]
   def []?(index : Int)
-    at index { nil }
+    at(index) { nil }
   end
 
   @[AlwaysInline]
