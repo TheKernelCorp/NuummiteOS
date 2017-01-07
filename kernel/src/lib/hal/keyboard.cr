@@ -115,11 +115,12 @@ module Keyboard
           break
         end
         if key.ord == 0x8 # backspace
+          print key if !silent && str.bytesize > 0 
           str = str.shrink! 1
         else
           str << key
+          print key unless silent
         end
-        print key unless silent || str.@bytesize == 0 
       end
       ioctl tty0, TerminalDevice::IOControl::CURSOR_SET_STATUS, cursor_enabled
     }
