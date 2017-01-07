@@ -213,6 +213,15 @@ class String
     end
   end
 
+  def chomp(arr : Array(Char))
+    arr.each do |chr|
+      if ends_with? chr
+        return unsafe_byte_slice_string 0, bytesize - chr.bytesize
+      end
+    end
+    self
+  end
+
   def chop
     return "" if bytesize <= 1
     if true &&
