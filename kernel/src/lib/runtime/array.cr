@@ -70,6 +70,27 @@ class Array(T)
     push value
   end
 
+  def [](start : Int, count : Int)
+    raise ArgumentError.new "negative count: #{count}" if count < 0
+    if start == size
+      return Array(T).new
+    end
+    start += size if start < 0
+    raise IndexError.new unless 0 <= start <= size
+    if count == 0
+      return Array(T).new
+    end
+    count = Math.min count, size - start
+    Array(T).build(count) do |buffer|
+      buffer.copy_from @buffer + start, count
+      count
+    end
+  end
+
+  def [](range : Range(Int, Int))
+    self[*range_to_index_and_count range]
+  end
+
   @[AlwaysInline]
   def unsafe_at(index : Int) : T
     @buffer[index]
@@ -95,6 +116,18 @@ class Array(T)
     else
       @buffer = Pointer(T).malloc @capacity.to_u64
     end
+  end
+
+  private def range_to_index_and_count(range)
+    from = range.begin
+    from += size if from < 0
+    raise IndexError.new if from < 0
+    to = range.end
+    to += size if to < 0
+    to -= 1 if range.excludes_end?
+    size = to - from + 1
+    size = 0 if size < 0
+    {from, size}
   end
 end
 
