@@ -4,8 +4,12 @@ def print(val)
   Terminal.write "#{val}"
 end
 
-def puts(val)
-  print "#{val}\n"
+def puts(val = nil)
+  unless val.nil?
+    print "#{val}\n"
+  else
+    print "\n"
+  end
 end
 
 private struct TerminalDevice

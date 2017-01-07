@@ -93,6 +93,11 @@ module Keyboard
     key
   end
 
+  def gets(prompt : String, silent = false) : String
+    print prompt
+    gets silent
+  end
+
   def gets(silent = false) : String
     String.build { |str|
       while true
@@ -100,7 +105,7 @@ module Keyboard
           asm("hlt")
         end
         key = Keyboard.read_key
-        print key unless silent
+        print key unless silent && key != '\n'
         break if key == '\n'
         str << key
       end
