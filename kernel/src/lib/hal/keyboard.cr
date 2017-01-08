@@ -29,7 +29,8 @@ private KBD_COM_SELF_TEST = 0xFF_u16
 module Keyboard
   extend self
 
-  @@shift : Bool?
+  @@lshift = false
+  @@rshift = false
   @@buffer = Deque(Char).new 256
 
   macro send_command(command)
@@ -65,22 +66,23 @@ module Keyboard
   def handle_keypress
     data = inb KBD_DATA
     pressed = (data & 0x80) == 0
+    data &= pressed ? 0xFF : ~0x80
     if pressed # Key pressed
-      case data
-        when 42 || 55 # LShift || RShift
-          @@shift = true
-          return
-      end
-      if @@shift
+      @@lshift = true if data == 42
+      @@rshift = true if data == 55
+      return if data == 42 || data == 55
+      if shift?
         # If shift is pressed, we want
         # the key codes from the second
         # half of the key map.
         data += 128
       end
-      @@shift = false
+      #@@shift = false
       key = KEYMAP_EN_US[data]
       buffer_key key
     else # Key released
+      @@lshift = false if data == 42
+      @@rshift = false if data == 55
     end
   end
 
@@ -124,6 +126,10 @@ module Keyboard
       end
       ioctl tty0, TerminalDevice::IOControl::CURSOR_SET_STATUS, cursor_enabled
     }
+  end
+
+  def shift?
+    @@lshift || @@rshift
   end
 
   def key_available?
