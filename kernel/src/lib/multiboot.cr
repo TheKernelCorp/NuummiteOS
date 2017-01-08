@@ -42,6 +42,7 @@ lib LibMultiboot
   MULTIBOOT_FRAMEBUFFER_TYPE_RGB      = 0x00000001
   MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT = 0x00000002
 
+  @[Packed]
   struct AoutInfo
     header_addr : UInt32
     load_addr : UInt32
@@ -50,6 +51,7 @@ lib LibMultiboot
     entry_addr : UInt32
   end
 
+  @[Packed]
   struct VideoInfo
     mode_type : UInt32
     width : UInt32
@@ -57,6 +59,7 @@ lib LibMultiboot
     depth : UInt32
   end
 
+  @[Packed]
   struct MultibootHeader
     magic : UInt32
     flags : UInt32
@@ -65,6 +68,7 @@ lib LibMultiboot
     video_info : VideoInfo
   end
 
+  @[Packed]
   struct AoutSymbolTable
     tab_size : UInt32
     str_size : UInt32
@@ -72,6 +76,7 @@ lib LibMultiboot
     reserved : UInt32
   end
 
+  @[Packed]
   struct ElfSectionHeaderTable
     num : UInt32
     size : UInt32
@@ -79,32 +84,38 @@ lib LibMultiboot
     shndx : UInt32
   end
 
+  @[Packed]
   union SymbolTable
     aout_sym : AoutSymbolTable
     elf_sec : ElfSectionHeaderTable
   end
 
+  @[Packed]
   struct FramebufferPaletteInfo
     fb_palette_addr : UInt32
     fb_palette_num_colors : UInt16
   end
 
+  @[Packed]
   struct FramebufferPaletteEntry
     field_position : UInt8
     mask_size : UInt8
   end
 
+  @[Packed]
   struct FramebufferPaletteData
     red : FramebufferPaletteEntry
     green : FramebufferPaletteEntry
     blue : FramebufferPaletteEntry
   end
 
+  @[Packed]
   union FramebufferPalette
     palette_mem : FramebufferPaletteInfo
     palette_data : FramebufferPaletteData
   end
 
+  @[Packed]
   struct FramebufferInfo
     fb_addr : UInt64
     fb_pitch : UInt32
@@ -115,6 +126,7 @@ lib LibMultiboot
     palette : FramebufferPalette
   end
 
+  @[Packed]
   struct VbeInfo
     vbe_control_info : UInt32
     vbe_mode_info : UInt32
@@ -125,6 +137,7 @@ lib LibMultiboot
     vbe_framebuffer_info : FramebufferInfo
   end
 
+  @[Packed]
   struct BootDevice
     drive : UInt8
     partition_1 : UInt8
@@ -132,6 +145,7 @@ lib LibMultiboot
     partition_3 : UInt8
   end
 
+  @[Packed]
   struct MultibootInfo
     flags : UInt32
     mem_lower : UInt32
