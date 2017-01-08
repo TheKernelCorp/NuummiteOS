@@ -1,7 +1,8 @@
 ; Multiboot constants
 MBALIGN   equ 1<<0
 MEMINFO   equ 1<<1
-FLAGS     equ MBALIGN | MEMINFO
+VIDINFO   equ 1<<2
+FLAGS     equ MBALIGN | MEMINFO | VIDINFO
 MAGIC     equ 0x1BADB002
 CHECKSUM  equ -(MAGIC + FLAGS)
 
@@ -11,6 +12,15 @@ align 4
     dd MAGIC
     dd FLAGS
     dd CHECKSUM
+    dd 0x00000000 
+    dd 0x00000000
+    dd 0x00000000
+    dd 0x00000000
+    dd 0x00000000
+    dd 0x00000000
+    dd 0
+    dd 0
+    dd 32
 
 section .text
 global _start

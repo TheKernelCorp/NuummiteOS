@@ -20,6 +20,7 @@ fun kearly(mboot_ptr : MultibootPointer)
   init_devices
   run_self_tests
   install_irq_handlers
+  write ttys0, String.new (Pointer(UInt8).new mboot_ptr.value.cmdline.to_u64)
 end
 
 def init_devices
