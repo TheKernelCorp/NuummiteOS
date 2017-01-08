@@ -33,6 +33,7 @@ end
 
 def install_irq_handlers
   IDT.add_handler 0, ->PIT.tick
+  IDT.add_handler 0, ->Async::Timeout.update
   IDT.add_handler 1, ->Keyboard.handle_keypress
 end
 

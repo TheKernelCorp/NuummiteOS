@@ -4,6 +4,7 @@ require "./runtime/indexable"
 
 # Alpha-sorted list
 require "./runtime/array"
+require "./runtime/async"
 require "./runtime/bool"
 require "./runtime/char"
 require "./runtime/class"

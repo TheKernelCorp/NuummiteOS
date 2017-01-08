@@ -90,6 +90,51 @@ class Deque(T)
     found
   end
 
+  def delete_at(index : Int)
+    if index < 0
+      index += @size
+    end
+    unless 0 <= index < @size
+      raise IndexError.new
+    end
+    return shift if index == 0
+    return pop if index == @size - 1
+    rindex = @start + index
+    rindex -= @capacity if rindex >= @capacity
+    value = @buffer[rindex]
+    if index > @size / 2
+      # Move following items to the left, starting with the first one
+      # [56-01234] -> [6x-01235]
+      dst = rindex
+      finish = (@start + @size - 1) % @capacity
+      loop do
+        src = dst + 1
+        src -= @capacity if src >= @capacity
+        @buffer[dst] = @buffer[src]
+        break if src == finish
+        dst = src
+      end
+      (@buffer + finish).clear
+    else
+      # Move preceding items to the right, starting with the last one
+      # [012345--] -> [x01345--]
+      dst = rindex
+      finish = @start
+      @start += 1
+      @start -= @capacity if @start >= @capacity
+      loop do
+        src = dst - 1
+        src += @capacity if src < 0
+        @buffer[dst] = @buffer[src]
+        break if src == finish
+        dst = src
+      end
+      (@buffer + finish).clear
+    end
+    @size -= 1
+    value
+  end
+
   def each
     halfs do |r|
       r.each do |i|

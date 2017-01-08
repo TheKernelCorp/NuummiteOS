@@ -28,6 +28,10 @@ module PIT
     @@ticks
   end
 
+  def frequency
+    @@frequency
+  end
+
   def sleep(ms : Int)
     end_tick_count = @@ticks + ((@@frequency * ms) / 1000)
     while @@ticks < end_tick_count
