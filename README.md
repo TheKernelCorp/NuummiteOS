@@ -1,7 +1,8 @@
 # NuummiteOS
 
 An OS written in [Crystal][crystal_home] as a Proof of Concept.   
-[Join our team on Discord!][discord]
+[Join our team on Discord!][discord]   
+[We also have IRC!][webchat] ( `#nuummite @ int0x10.com:6697 (SSL)` )
 
 ## Building on Linux/WSL
 
@@ -28,3 +29,4 @@ An OS written in [Crystal][crystal_home] as a Proof of Concept.
 [crystal_home]: https://crystal-lang.org
 [crystal_compiler]: https://crystal-lang.org/docs/installation/index.html
 [discord]: https://discord.gg/nmESdX8
+[webchat]: http://int0x10.com/webchat?nick=&channels=nuummite%2Cprogramming%2C%23chat
