@@ -19,9 +19,16 @@ module Async::Timeout
     }
   end
 
-  def register(duration : Int, callback : -> Nil)
+  # One-shot timeout: register(duration, callback)
+  # Periodic timeout: register(duration, callback, :repeat)
+  def register(duration : Int, callback : -> Nil, repeat = false)
     raise "Timeout limit reached!" unless @@list.size < MAX_TIMEOUTS
-    @@list.push TickTimeout.new(duration, callback)
+    proc = repeat ? -> {
+      callback
+      register duration, callback
+      nil
+    } : callback
+    @@list.push TickTimeout.new(duration, proc)
   end
 end
 
