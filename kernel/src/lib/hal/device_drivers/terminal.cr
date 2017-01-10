@@ -39,7 +39,7 @@ class TerminalDevice < Device
 
   # Initializes the `Terminal`.
   def initialize(name : String, rescue_term = false)
-    fc, bc = { 0x8_u8, 0x0_u8 }
+    fc, bc = { 0x7_u8, 0x0_u8 }
     @use_cursor = true
     if rescue_term
       @name = name
@@ -90,7 +90,7 @@ class TerminalDevice < Device
   def ioctl(code : Enum, data = nil)
     case code
     when IOControl::COLOR_GET
-      raise "Invalid data" unless data.is_a? Int8*
+      raise "Invalid data" unless data.is_a? UInt8*
       data.value = @color
     when IOControl::COLOR_SET
       raise "Invalid data" unless data.is_a? Int
