@@ -1,3 +1,4 @@
+require "./helper"
 require "./builtins"
 
 class NuumShell
@@ -13,7 +14,6 @@ class NuumShell
     until @login
       login
     end
-    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0F
     loop do
       prompt = "#{@user}@Nuummite:/# "
       line, command, args = read_command prompt
@@ -51,7 +51,7 @@ class NuumShell
     end
   end
 
-  def help
+  private def help
     apps = ["help", "echo", "mem", "shutdown"]
     puts "Available commands are"
     num = 1
@@ -61,9 +61,12 @@ class NuumShell
     end
   end
 
-  def banner
+  private def banner
     # The following is a mess
     # But it's a beautiful mess
+    color = 0_u8
+    ioctl tty0, TerminalDevice::IOControl::COLOR_GET, pointerof(color)
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x07
     print "Hello from "
     ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0A
     print "N"
@@ -79,7 +82,7 @@ class NuumShell
     print "t"
     ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x0F
     print "e"
-    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, 0x08
+    ioctl tty0, TerminalDevice::IOControl::COLOR_SET, color
     puts "!"
   end
 
