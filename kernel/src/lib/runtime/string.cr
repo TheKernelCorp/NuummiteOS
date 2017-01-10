@@ -389,6 +389,321 @@ class String
     yield String.new to_unsafe + byte_offset, piece_bytesize, piece_size
   end
 
+  def delete
+    String.build(bytesize) do |buffer|
+      each_char do |char|
+        buffer << char unless yield char
+      end
+    end
+  end
+
+  def delete(char : Char)
+    delete { |my_char| my_char == char }
+  end
+
+  def ljust(len, char : Char = ' ')
+    just len, char, true
+  end
+
+  def rjust(len, char : Char = ' ')
+    just len, char, false
+  end
+
+  private def just(len, char, left)
+    return self if size >= len
+    bytes, count = String.char_bytes_and_bytesize char
+    difference = len - size
+    new_bytesize = bytesize + difference * count
+    String.new(new_bytesize) do |buffer|
+      if left
+        buffer.copy_from to_unsafe, bytesize
+        buffer += bytesize
+      end
+      if count == 1
+        LibC.memset buffer.to_void_ptr, char.ord.to_u8, difference.to_u32
+        buffer += difference
+      else
+        difference.times do
+          buffer.copy_from bytes.to_unsafe, count
+          buffer += count
+        end
+      end
+      unless left
+        buffer.copy_from to_unsafe, bytesize
+      end
+      {new_bytesize, len}
+    end
+  end
+
+  def to_i(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true)
+    to_i32(base, whitespace, underscore, prefix, strict)
+  end
+
+  # Same as `#to_i`, but returns `nil` if there is not a valid number at the start
+  # of this string, or if the resulting integer doesn't fit an Int32.
+  def to_i?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true)
+    to_i32?(base, whitespace, underscore, prefix, strict)
+  end
+
+  # Same as `#to_i`, but returns the block's value if there is not a valid number at the start
+  # of this string, or if the resulting integer doesn't fit an Int32.
+  def to_i(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    to_i32(base, whitespace, underscore, prefix, strict) { yield }
+  end
+
+  # Same as `#to_i` but returns an Int8.
+  def to_i8(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int8
+    to_i8(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid Int8: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `Int8` or nil.
+  def to_i8?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int8?
+    to_i8(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `Int8` or the block's value.
+  def to_i8(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ i8, 127, 128
+  end
+
+  # Same as `#to_i` but returns an UInt8.
+  def to_u8(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt8
+    to_u8(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid UInt8: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `UInt8` or nil.
+  def to_u8?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt8?
+    to_u8(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `UInt8` or the block's value.
+  def to_u8(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ u8, 255
+  end
+
+  # Same as `#to_i` but returns an Int16.
+  def to_i16(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int16
+    to_i16(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid Int16: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `Int16` or nil.
+  def to_i16?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int16?
+    to_i16(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `Int16` or the block's value.
+  def to_i16(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ i16, 32767, 32768
+  end
+
+  # Same as `#to_i` but returns an UInt16.
+  def to_u16(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt16
+    to_u16(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid UInt16: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `UInt16` or nil.
+  def to_u16?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt16?
+    to_u16(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `UInt16` or the block's value.
+  def to_u16(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ u16, 65535
+  end
+
+  # Same as `#to_i`.
+  def to_i32(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int32
+    to_i32(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid Int32: #{self}") }
+  end
+
+  # Same as `#to_i`.
+  def to_i32?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int32?
+    to_i32(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i`.
+  def to_i32(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ i32, 2147483647, 2147483648
+  end
+
+  # Same as `#to_i` but returns an UInt32.
+  def to_u32(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt32
+    to_u32(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid UInt32: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `UInt32` or nil.
+  def to_u32?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt32?
+    to_u32(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `UInt32` or the block's value.
+  def to_u32(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ u32, 4294967295
+  end
+
+  # Same as `#to_i` but returns an Int64.
+  def to_i64(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int64
+    to_i64(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid Int64: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `Int64` or nil.
+  def to_i64?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : Int64?
+    to_i64(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `Int64` or the block's value.
+  def to_i64(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ i64, 9223372036854775807, 9223372036854775808
+  end
+
+  # Same as `#to_i` but returns an UInt64.
+  def to_u64(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt64
+    to_u64(base, whitespace, underscore, prefix, strict) { raise ArgumentError.new("invalid UInt64: #{self}") }
+  end
+
+  # Same as `#to_i` but returns an `UInt64` or nil.
+  def to_u64?(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true) : UInt64?
+    to_u64(base, whitespace, underscore, prefix, strict) { nil }
+  end
+
+  # Same as `#to_i` but returns an `UInt64` or the block's value.
+  def to_u64(base : Int = 10, whitespace = true, underscore = false, prefix = false, strict = true, &block)
+    gen_to_ u64
+  end
+
+  # :nodoc:
+  CHAR_TO_DIGIT = begin
+    table = StaticArray(Int8, 256).new(-1_i8)
+    10_i8.times do |i|
+      table.to_unsafe[48 + i] = i
+    end
+    26_i8.times do |i|
+      table.to_unsafe[65 + i] = i + 10
+      table.to_unsafe[97 + i] = i + 10
+    end
+    table
+  end
+
+  # :nodoc:
+  CHAR_TO_DIGIT62 = begin
+    table = CHAR_TO_DIGIT.clone
+    26_i8.times do |i|
+      table.to_unsafe[65 + i] = i + 36
+    end
+    table
+  end
+
+  # :nodoc:
+  record ToU64Info,
+    value : UInt64,
+    negative : Bool,
+    invalid : Bool
+
+  # :nodoc:
+  macro gen_to_(method, max_positive = nil, max_negative = nil)
+    info = to_u64_info(base, whitespace, underscore, prefix, strict)
+    return yield if info.invalid
+    if info.negative
+      {% if max_negative %}
+        return yield if info.value > {{max_negative}}
+        -info.value.to_{{method}}
+      {% else %}
+        return yield
+      {% end %}
+    else
+      {% if max_positive %}
+        return yield if info.value > {{max_positive}}
+      {% end %}
+      info.value.to_{{method}}
+    end
+  end
+
+  private def to_u64_info(base, whitespace, underscore, prefix, strict)
+    raise ArgumentError.new("invalid base #{base}") unless 2 <= base <= 36 || base == 62
+    ptr = to_unsafe
+    # Skip leading whitespace
+    if whitespace
+      while ptr.value.unsafe_chr.ascii_whitespace?
+        ptr += 1
+      end
+    end
+    negative = false
+    found_digit = false
+    mul_overflow = ~0_u64 / base
+    # Check + and -
+    case ptr.value.unsafe_chr
+    when '+'
+      ptr += 1
+    when '-'
+      negative = true
+      ptr += 1
+    end
+    # Check leading zero
+    if ptr.value.unsafe_chr == '0'
+      ptr += 1
+      if prefix
+        case ptr.value.unsafe_chr
+        when 'b'
+          base = 2
+          ptr += 1
+        when 'x'
+          base = 16
+          ptr += 1
+        else
+          base = 8
+        end
+        found_digit = false
+      else
+        found_digit = true
+      end
+    end
+    value = 0_u64
+    last_is_underscore = true
+    invalid = false
+    digits = (base == 62 ? CHAR_TO_DIGIT62 : CHAR_TO_DIGIT).to_unsafe
+    while ptr.value != 0
+      if ptr.value.unsafe_chr == '_' && underscore
+        break if last_is_underscore
+        last_is_underscore = true
+        ptr += 1
+        next
+      end
+      last_is_underscore = false
+      digit = digits[ptr.value]
+      if digit == -1 || digit >= base
+        break
+      end
+      if value > mul_overflow
+        invalid = true
+        break
+      end
+      value *= base
+      old = value
+      value += digit
+      if value < old
+        invalid = true
+        break
+      end
+      found_digit = true
+      ptr += 1
+    end
+    if found_digit
+      unless ptr.value == 0
+        if whitespace
+          while ptr.value.unsafe_chr.ascii_whitespace?
+            ptr += 1
+          end
+        end
+        if strict && ptr.value != 0
+          invalid = true
+        end
+      end
+    else
+      invalid = true
+    end
+    ToU64Info.new value, negative, invalid
+  end
+
   private def split_by_empty_separator(limit, &block : String -> _)
     yielded = 0
     each_char do |c|
@@ -493,6 +808,16 @@ class String
 
   protected def unsafe_byte_slice_string(byte_offset, count)
     String.new unsafe_byte_slice(byte_offset, count)
+  end
+
+  protected def self.char_bytes_and_bytesize(char : Char)
+    bytes = uninitialized UInt8[4]
+    bytesize = 0
+    char.each_byte do |byte|
+      bytes[bytesize] = byte
+      bytesize += 1
+    end
+    {bytes, bytesize}
   end
 
   private def calc_excess_right
