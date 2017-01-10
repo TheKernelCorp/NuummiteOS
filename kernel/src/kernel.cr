@@ -1,26 +1,28 @@
 lib LibBootstrap
-  $end_of_kernel = END_OF_KERNEL : Pointer(UInt8)
+  @[Packed]
+  struct EarlyInfo
+    end_of_kernel : UInt32
+    mboot_ptr : MultibootPointer
+  end
 end
 
 require "./lib/nuumshell/shell"
 require "./lib/prelude"
 
-fun kearly(mboot_ptr : MultibootPointer)
+fun kearly(info : LibBootstrap::EarlyInfo)
   # The following code breaks stuff
-  # sym = LibBootstrap.end_of_kernel
-  # end_of_kernel = pointerof(sym)
-  # Heap.init end_of_kernel.address.to_u32
   GDT.setup
   PIC.remap
   PIC.enable
-  Heap.init 2_000_000_u32
+  Heap.init info.end_of_kernel
+  # Heap.init 2_000_000_u32
   IDT.setup
   PIT.setup 100
   Keyboard.init
   init_devices
   run_self_tests
   install_irq_handlers
-  write ttys0, String.new(Pointer(UInt8).new(mboot_ptr.value.cmdline.to_u64))
+  write ttys0, String.new(Pointer(UInt8).new(info.mboot_ptr.value.cmdline.to_u64))
 end
 
 def init_devices

@@ -38,6 +38,8 @@ _start:
 ; Jumps into the Crystal kernel.
 ;
 enter_kernel:
+    extern END_OF_KERNEL
+    push dword END_OF_KERNEL
     extern kearly
     call kearly
     extern kmain

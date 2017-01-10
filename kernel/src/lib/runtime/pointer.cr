@@ -35,10 +35,7 @@ struct Pointer(T)
   end
 
   def -(other : Int)
-    if other > address
-      panic
-    end
-    self + (0 - other)
+    self + (-other)
   end
 
   def <(other : Pointer(_))
