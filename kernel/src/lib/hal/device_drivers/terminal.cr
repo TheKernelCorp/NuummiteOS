@@ -3,6 +3,7 @@ RESCUE_TERM = TerminalDevice.new("__NU_RESCUE_TTY", true)
 def print(val)
   return unless val
   write tty0, "#{val}"
+  ioctl tty0, TerminalDevice::IOControl::CURSOR_UPDATE, nil
 end
 
 def puts(val = nil)
@@ -11,6 +12,7 @@ def puts(val = nil)
   else
     write tty0, "#{val}\r\n"
   end
+  ioctl tty0, TerminalDevice::IOControl::CURSOR_UPDATE, nil
 end
 
 class TerminalDevice < Device
@@ -28,6 +30,9 @@ class TerminalDevice < Device
     # Set cursor status
     # Data : Bool
     CURSOR_SET_STATUS = CURSOR_GET_STATUS | 1
+    # Update cursor position
+    # Data : None
+    CURSOR_UPDATE = 1 << 3
   end
 
   # Constants
@@ -80,7 +85,6 @@ class TerminalDevice < Device
     if @x >= VGA_WIDTH
       newline
     end
-    update_cursor @x, @y
   end
 
   def read_byte : UInt8
@@ -101,6 +105,8 @@ class TerminalDevice < Device
     when IOControl::CURSOR_SET_STATUS
       raise "Invalid data" unless data.is_a? Bool
       data ? enable_cursor : disable_cursor
+    when IOControl::CURSOR_UPDATE
+      update_cursor @x, @y
     end
   end
 
@@ -112,6 +118,7 @@ class TerminalDevice < Device
     else
       scroll
     end
+    update_cursor @x, @y
   end
 
   # Clears the screen.
