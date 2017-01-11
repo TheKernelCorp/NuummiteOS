@@ -14,9 +14,9 @@ fun kearly(info : LibBootstrap::EarlyInfo)
   GDT.setup
   PIC.remap
   PIC.enable
-  Heap.init info.end_of_kernel
-  # Heap.init 2_000_000_u32
   IDT.setup
+  Heap.init info.end_of_kernel
+  IDT.post_heap_setup
   PIT.setup 100
   Keyboard.init
   init_devices

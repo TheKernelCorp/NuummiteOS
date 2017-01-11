@@ -40,6 +40,9 @@ struct IDT
 
   def self.setup
     LibGlue.setup_idt
+  end
+
+  def self.post_heap_setup
     {% for i in 0...16 %}
       @@handlers[{{ i }}] = Array(InterruptHandler).new
     {% end %}
