@@ -15,6 +15,7 @@ fun kearly(info : LibBootstrap::EarlyInfo)
   PIC.remap
   PIC.enable
   IDT.setup
+  Paging.setup
   Heap.init info.end_of_kernel
   IDT.post_heap_setup
   PIT.setup 100

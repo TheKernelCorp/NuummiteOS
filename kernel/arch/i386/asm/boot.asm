@@ -97,19 +97,18 @@ glue_setup_idt:
     call idt_setup
     ret
 
+;
+; Nuummite export:
+; Setup paging
+;
+global glue_setup_paging
+glue_setup_paging:
+    extern paging_setup
+    call paging_setup
+    ret
+
 section .bss
 align 4096
-
-;
-; Page tables.
-;
-page_tables:
-.p4:
-    resb 4096
-.p3:
-    resb 4096
-.p2:
-    resb 4096
 
 ;
 ; Kernel stack.
