@@ -220,15 +220,16 @@ for f in asm_sources:
     objects.append(o[0])
 
 # Rule :: Compile kernel
-env.CrystalProgram(source=files['src']['kernel.cr'])
+crystal = env.CrystalProgram(source=files['src']['kernel.cr'])
 
 # Rule :: Link objects
-env.Link(target=files['obj']['kernel'], source=objects)
+kernel = env.Link(target=files['obj']['kernel'], source=objects)
+Requires(kernel, crystal)
 
 # Rule :: Build kernel image
 iso = env.Command(
     files['dst']['iso'],
-    files['obj']['kernel'], [
+    kernel, [
         Copy(files['dst']['grub.cfg'], files['src']['grub.cfg']),
         Copy(files['dst']['kernel'], files['obj']['kernel']),
         BuildKernelImage
@@ -236,4 +237,4 @@ iso = env.Command(
 )
 
 # Rule :: Run QEMU
-if qemu: env.Command('_', iso, RunQEMU)
+if qemu: env.Command('__qemu', iso, RunQEMU)
