@@ -6,5 +6,13 @@ isodir
 sysroot
 bc_flags
 
+# Crystal
+.crystal
+
 # VSCode stuff
 .vscode
+
+# SConstruct
+.sconf_temp
+.sconsign.dblite
+config.log
