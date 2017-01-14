@@ -34,62 +34,75 @@ lib LibIDT
 end
 
 alias InterruptHandler = -> Nil
+alias ExceptionHandler = (LibIDT::StackFrame) -> Nil 
 
-struct IDT
-  @@handlers = uninitialized Array(InterruptHandler)[16]
+module IDT
+  extend self
 
-  def self.setup
+  ISR_COUNT = 32
+  IRQ_COUNT = 16
+  @@isrs = uninitialized ExceptionHandler[ISR_COUNT]
+  @@irqs = uninitialized InterruptHandler[IRQ_COUNT]
+
+  def setup
     LibGlue.setup_idt
-  end
-
-  def self.post_heap_setup
-    {% for i in 0...16 %}
-      @@handlers[{{ i }}] = Array(InterruptHandler).new
+    {% for i in 0...ISR_COUNT %}
+      @@isrs[{{ i }}] = ->handle_exception(LibIDT::StackFrame)
+    {% end %}
+    {% for i in 0...IRQ_COUNT %}
+      @@irqs[{{ i }}] = ->{ nil }
     {% end %}
   end
 
-  def self.add_handler(irq : Int, handler : InterruptHandler)
+  def add_handler(irq : Int, handler : InterruptHandler)
     if irq < 0 || irq > 16
       raise "Invalid IRQ number. Valid: [0..16]"
     end
-    @@handlers[irq].push handler
+    @@irqs[irq] = handler
+  end
+
+  def add_fault_handler(isr : Int, handler : ExceptionHandler)
+    if isr < 0 || isr > 31
+      raise "Invalid ISR number. Valid: [0..31]"
+    end
+    @@isrs[isr] = handler
   end
 
   @[AlwaysInline]
-  def self.enable_interrupts
+  def enable_interrupts
     asm("sti")
   end
 
   @[AlwaysInline]
-  def self.disable_interrupts
+  def disable_interrupts
     asm("cli")
   end
 
-  def self.handle_isr(frame : LibIDT::StackFrame)
+  def handle_isr(frame : LibIDT::StackFrame)
     if frame.intr < 0x20
-      self.handle_exception frame
+      @@isrs[frame.intr].call frame
     elsif frame.intr >= 0x20 && frame.intr <= 0x2F
       irq = frame.intr - 0x20
-      if @@handlers[irq].size != 0
-        i = 0
-        while i < @@handlers[irq].size
-          callback = @@handlers[irq][i]
-          callback.call
-          i += 1
-        end
-      end
+      @@irqs[irq].call
     else
       raise "Syscalls are not yet unsupported", "(Interrupt)", 0
     end
     PIC.acknowledge frame.intr
   end
 
-  def self.handle_exception(frame : LibIDT::StackFrame)
+  def handle_exception(frame : LibIDT::StackFrame)
     if frame.intr < 0x14
       raise EXCEPTION_MESSAGES[frame.intr], "(Interrupt)", 0
     else
       raise "Reserved exception occurred. This is a bug.", "(Interrupt)", 0
     end
+    asm("cli; hlt;")
+  end
+
+  def halt
     asm("cli; hlt")
+    while true
+      asm("hlt")
+    end
   end
 end

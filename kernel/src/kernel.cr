@@ -15,9 +15,8 @@ fun kearly(info : LibBootstrap::EarlyInfo)
   PIC.remap
   PIC.enable
   IDT.setup
-  Paging.setup
+  #Paging.setup
   Heap.init info.end_of_kernel
-  IDT.post_heap_setup
   PIT.setup 100
   Keyboard.init
   init_devices
@@ -35,8 +34,11 @@ def init_devices
 end
 
 def install_irq_handlers
-  IDT.add_handler 0, ->PIT.tick
-  IDT.add_handler 0, ->Async::Timeout.update
+  IDT.add_handler 0, ->{
+    PIT.tick
+    Async::Timeout.update
+    nil
+  }
   IDT.add_handler 1, ->Keyboard.handle_keypress
 end
 
