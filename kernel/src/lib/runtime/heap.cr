@@ -13,6 +13,10 @@ struct HeapAllocator(T)
     Heap.kalloc(sizeof(T).to_u32).as T*
   end
 
+  def self.palloc : T*
+    Heap.palloc(sizeof(T).to_u32).as T*
+  end
+
   def self.realloc(ptr : T*, size : USize) : T*
     Heap.realloc(ptr, size).as T*
   end
@@ -20,6 +24,7 @@ struct HeapAllocator(T)
   def self.realloc(ptr : _*) : T*
     Heap.realloc(ptr, sizeof(T).to_u32).as T*
   end
+
 end
 
 private lib LibHeap
@@ -70,6 +75,12 @@ struct Heap
     instance.value.kalloc size
   end
 
+  def self.palloc(size : USize) : UInt8*
+    instance = @@instance
+    raise "Unable to palloc memory" unless instance
+    instance.value.palloc size
+  end
+
   def self.free(ptr : _*, __file__ = __FILE__, __line__ = __LINE__)
     instance = @@instance
     raise "Unable to free memory" unless instance
@@ -102,6 +113,12 @@ struct Heap
     block = alloc size
     raise "Unable to kalloc memory" unless block
     block.value.block_chunk
+  end
+
+  def palloc(size : USize) : UInt8*
+    @free_addr = Pointer(UInt8).new ((@free_addr.address & 0xFFFFF000) + 0x1000).to_u64
+    @free_addr += size
+    @free_addr - size.to_i64
   end
 
   private def alloc(size : USize) : Block*
