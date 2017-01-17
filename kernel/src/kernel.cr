@@ -11,12 +11,12 @@ require "./lib/prelude"
 
 fun kearly(info : LibBootstrap::EarlyInfo)
   # The following code breaks stuff
+  Heap.init info.end_of_kernel
   GDT.setup
   PIC.remap
   PIC.enable
   IDT.setup
-  #Paging.setup
-  Heap.init info.end_of_kernel
+  Paging.setup
   PIT.setup 100
   Keyboard.init
   init_devices

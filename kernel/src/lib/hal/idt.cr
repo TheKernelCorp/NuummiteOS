@@ -34,7 +34,7 @@ lib LibIDT
 end
 
 alias InterruptHandler = -> Nil
-alias ExceptionHandler = (LibIDT::StackFrame) -> Nil 
+alias ExceptionHandler = LibIDT::StackFrame -> Nil
 
 module IDT
   extend self

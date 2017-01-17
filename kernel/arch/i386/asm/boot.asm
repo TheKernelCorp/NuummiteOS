@@ -97,16 +97,6 @@ glue_setup_idt:
     call idt_setup
     ret
 
-;
-; Nuummite export:
-; Setup paging
-;
-global glue_setup_paging
-glue_setup_paging:
-    extern paging_setup
-    call paging_setup
-    ret
-
 section .bss
 align 4096
 

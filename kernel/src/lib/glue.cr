@@ -9,7 +9,6 @@ end
 lib LibGlue
   fun setup_gdt = "glue_setup_gdt"
   fun setup_idt = "glue_setup_idt"
-  fun setup_paging = "glue_setup_paging"
 end
 
 # Crystal runtime glue
