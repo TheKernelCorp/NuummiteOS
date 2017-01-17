@@ -47,7 +47,7 @@ struct Pointer(T)
   end
 
   def ==(other : Int)
-    address == other.address.to_i64
+    address == other.to_u64
   end
 
   def ==(other : Pointer(_))
