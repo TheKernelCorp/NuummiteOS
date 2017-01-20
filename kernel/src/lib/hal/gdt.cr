@@ -12,21 +12,63 @@ lib LibGDT
     kernel_data : UInt64
     user_code : UInt64
     user_data : UInt64
+    user_tss : UInt64
+  end
+
+  @[Packed]
+  struct TSS
+    link : UInt32
+    esp0 : UInt32
+    ss0 : UInt32
+    esp1 : UInt32
+    ss1 : UInt32
+    esp2 : UInt32
+    ss2 : UInt32
+    cr3 : UInt32
+    eip : UInt32
+    eflags : UInt32
+    eax : UInt32
+    ecx : UInt32
+    edx : UInt32
+    ebx : UInt32
+    esp : UInt32
+    ebp : UInt32
+    esi : UInt32
+    edi : UInt32
+    es : UInt32
+    cs : UInt32
+    ss : UInt32
+    ds : UInt32
+    fs : UInt32
+    gs : UInt32
+    ldt : UInt32
+    trap : UInt32
+    iomap_base : UInt32
   end
 end
 
 module GDT
   extend self
 
+  @@tss = uninitialized LibGDT::TSS
   @@gdt = uninitialized LibGDT::GDT
   @@gdtr = uninitialized LibGDT::GDTR
 
   def setup
+    LibC.memset pointerof(@@tss), 0_u8, sizeof(LibGDT::TSS).to_u32
+    @@tss.ss0 = 0x10
+    @@tss.cs = 0x0b
+    @@tss.ss = 0x13
+    @@tss.ds = 0x13
+    @@tss.es = 0x13
+    @@tss.fs = 0x13
+    @@tss.gs = 0x13
     @@gdt.null = 0_u64
     @@gdt.kernel_code = create_descriptor 0_u64, 0xFFFFF_u64, GDT_kernel_code
     @@gdt.kernel_data = create_descriptor 0_u64, 0xFFFFF_u64, GDT_kernel_data
     @@gdt.user_code = create_descriptor 0_u64, 0xFFFFF_u64, GDT_user_code
     @@gdt.user_data = create_descriptor 0_u64, 0xFFFFF_u64, GDT_user_data
+    @@gdt.user_tss = create_descriptor pointerof(@@tss).address, sizeof(LibGDT::TSS).to_u64, GDT_user_tss
     @@gdtr.limit = sizeof(LibGDT::GDT).to_u16 - 1_u16
     @@gdtr.base = pointerof(@@gdt).address.to_u32
     asm("
@@ -37,8 +79,10 @@ module GDT
       movw %ax, %fs
       movw %ax, %gs
       movw %ax, %ss
-    " :: "{eax}"(pointerof(@@gdtr).address))
-    LibGlue.flush_gdt
+      call glue_flush_gdt
+      movw $$0x2b, %ax
+      ltrw %ax"
+      :: "{eax}"(pointerof(@@gdtr).address))
   end
 
   private def create_descriptor(base : UInt64, limit : UInt64, flags : UInt64) : UInt64

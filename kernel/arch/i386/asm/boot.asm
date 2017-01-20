@@ -61,16 +61,6 @@ glue_flush_gdt:
 
 ;
 ; Nuummite export:
-; Flush TSS
-;
-global glue_flush_tss
-glue_flush_tss:
-    mov ax, 0x2b
-    ltr ax
-    ret
-
-;
-; Nuummite export:
 ; Setup IDT
 ;
 global glue_setup_idt
