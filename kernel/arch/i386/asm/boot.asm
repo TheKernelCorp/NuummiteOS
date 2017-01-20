@@ -55,16 +55,8 @@ enter_kernel:
 ;
 global glue_flush_gdt
 glue_flush_gdt:
-    mov eax, [esp + 4]
-    lgdt [eax]
     jmp 0x08:.flush
 .flush:
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
     ret
 
 ;
@@ -75,16 +67,6 @@ global glue_flush_tss
 glue_flush_tss:
     mov ax, 0x2b
     ltr ax
-    ret
-
-;
-; Nuummite export:
-; Setup GDT
-;
-global glue_setup_gdt
-glue_setup_gdt:
-    extern gdt_setup
-    call gdt_setup
     ret
 
 ;

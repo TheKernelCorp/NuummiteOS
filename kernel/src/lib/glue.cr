@@ -7,7 +7,7 @@ end
 # Nuummite -> Assembly
 
 lib LibGlue
-  fun setup_gdt = "glue_setup_gdt"
+  fun flush_gdt = "glue_flush_gdt"
   fun setup_idt = "glue_setup_idt"
 end
 
