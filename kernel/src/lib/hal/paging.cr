@@ -1,3 +1,5 @@
+alias PageDirectory = LibPaging::PageDirectory
+
 lib LibPaging
   @[Packed]
   struct PageTable
@@ -8,19 +10,22 @@ lib LibPaging
   struct PageDirectory
     tables : PageTable*[1024]
     physical_tables : UInt32[1024]
-    physical_address : UInt32
+    paddr : UInt32
   end
 end
 
 module Paging
   extend self
 
-  @@current_directory = Pointer(LibPaging::PageDirectory).null
+  PAGE_RW = 0x01_u32
+  PAGE_USER = 0x02_u32
+
+  @@current_directory = Pointer(PageDirectory).null
 
   def setup
-    IDT.add_fault_handler 14, ->handle_page_fault(LibIDT::StackFrame)
-    kernel_directory = HeapAllocator(LibPaging::PageDirectory).palloc
-    LibC.memset kernel_directory, 0_u8, sizeof(LibPaging::PageDirectory).to_u32
+    IDT.add_fault_handler 14, ->handle_page_fault(StackFrame)
+    kernel_directory = HeapAllocator(PageDirectory).palloc
+    LibC.memset kernel_directory, 0_u8, sizeof(PageDirectory).to_u32
     switch_page_directory kernel_directory
     addr = 0_u32
     while addr < 0x4000000_u32
@@ -30,32 +35,29 @@ module Paging
     enable
   end
 
-  private def page_alloc(directory : LibPaging::PageDirectory*,
-                         virtual_address : UInt32,
-                         physical_address : UInt32,
-                         read_write : Bool,
-                         user : Bool)
-    virtual_address /= 0x1000
-    i = virtual_address / 0x400
+  private def page_alloc(directory : PageDirectory*, vaddr : UInt32, paddr : UInt32, read_write : Bool, user : Bool)
+    vaddr /= 0x1000
+    i = vaddr / 0x400
     if directory.value.tables[i] == 0
       page = HeapAllocator(LibPaging::PageTable).palloc
       LibC.memset page, 0_u8, sizeof(LibPaging::PageTable).to_u32
       directory.value.tables[i] = page
       directory.value.physical_tables[i] = page.address.to_u32 | 0x7
     end
-    page_index = virtual_address % 0x400
+    page_index = vaddr % 0x400
     page = directory.value.tables[i].value.pages[page_index]
     return if PageHelper.present?(page)
     page = PageHelper.set_present(page, true)
     page = PageHelper.set_read_write(page, read_write)
     page = PageHelper.set_user(page, user)
-    page = PageHelper.set_frame(page, physical_address >> 12)
+    page = PageHelper.set_frame(page, paddr >> 12)
     directory.value.tables[i].value.pages[page_index] = page
   end
 
-  private def handle_page_fault(frame : LibIDT::StackFrame)
+  private def handle_page_fault(frame : StackFrame)
     fault_address = 0_u32
     asm("mov %cr2, $0" : "=r"(fault_address))
+    # frame_alloc @@current_directory, fault_address & 0xFFFFF000, PAGE_RW
     raise "Page fault at #{Pointer(UInt32).new(fault_address.to_u64)}"
   end
 
