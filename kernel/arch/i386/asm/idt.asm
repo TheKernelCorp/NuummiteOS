@@ -1,4 +1,5 @@
 global idt_setup
+global active_stack
 
 ;
 ; Routine to set the IDT up.
@@ -24,14 +25,12 @@ idt_handle_isr:
     mov es, ax
     mov fs, ax
     mov gs, ax
-    mov eax, esp
 .handle:
-    push eax
+    mov [active_stack], esp ; backup stack
     ; Defined in src/lib/glue.cr
     extern glue_handle_isr
-    mov eax, glue_handle_isr
-    call eax
-    pop eax
+    call glue_handle_isr
+    mov esp, [active_stack] ; apply new stack
 .leave:
     pop gs
     pop fs
@@ -39,7 +38,7 @@ idt_handle_isr:
     pop ds
     popa
     add esp, 8
-    iret
+    iretd
 
 ;
 ; Macro to calculate the base address of an IDT gate.
@@ -213,6 +212,15 @@ idt_handlers:
     isr 45
     isr 46
     isr 47
+
+section .data
+align 4
+
+;
+; Address of the active stack.
+;
+active_stack:
+    dd 0
 
 section .rodata
 align 8
