@@ -1,7 +1,7 @@
 # Assembly -> Nuummite
 
-fun glue_handle_isr(frame : LibIDT::StackFrame*)
-  IDT.handle_isr frame.value
+fun glue_handle_isr(frame : LibIDT::StackFrame)
+  IDT.handle_isr frame
 end
 
 # Nuummite -> Assembly

@@ -78,7 +78,15 @@ module IDT
     asm("cli")
   end
 
-  def handle_isr(frame : LibIDT::StackFrame)
+  @[AlwaysInline]
+  def halt
+    asm("cli; hlt")
+    while true
+      asm("hlt")
+    end
+  end
+
+  def handle_isr(frame : StackFrame)
     if frame.intr < 0x20
       @@isrs[frame.intr].call frame
     elsif frame.intr >= 0x20 && frame.intr <= 0x2F
@@ -90,19 +98,12 @@ module IDT
     PIC.acknowledge frame.intr
   end
 
-  def handle_exception(frame : LibIDT::StackFrame)
+  def handle_exception(frame : StackFrame)
     if frame.intr < 0x14
       raise EXCEPTION_MESSAGES[frame.intr], "(Interrupt)", 0
     else
       raise "Reserved exception occurred. This is a bug.", "(Interrupt)", 0
     end
     asm("cli; hlt;")
-  end
-
-  def halt
-    asm("cli; hlt")
-    while true
-      asm("hlt")
-    end
   end
 end
