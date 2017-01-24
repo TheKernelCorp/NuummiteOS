@@ -54,15 +54,19 @@ module GDT
   @@gdt = uninitialized LibGDT::GDT
   @@gdtr = uninitialized LibGDT::GDTR
 
+  def set_tss_esp0(esp0 : UInt32)
+    @@tss.esp0 = esp0
+  end
+
   def setup
     LibC.memset pointerof(@@tss), 0_u8, sizeof(LibGDT::TSS).to_u32
     @@tss.ss0 = 0x10
-    @@tss.cs = 0x0b
-    @@tss.ss = 0x13
-    @@tss.ds = 0x13
-    @@tss.es = 0x13
-    @@tss.fs = 0x13
-    @@tss.gs = 0x13
+    @@tss.cs = 0x18 | 0x03
+    @@tss.ss = 0x20 | 0x03
+    @@tss.ds = 0x20 | 0x03
+    @@tss.es = 0x20 | 0x03
+    @@tss.fs = 0x20 | 0x03
+    @@tss.gs = 0x20 | 0x03
     @@gdt.null = 0_u64
     @@gdt.kernel_code = create_descriptor 0_u64, 0xFFFFF_u64, GDT_kernel_code
     @@gdt.kernel_data = create_descriptor 0_u64, 0xFFFFF_u64, GDT_kernel_data
@@ -127,5 +131,5 @@ module GDT
   private GDT_user_base = GDT_kernel_base | seg_priv(3)
   private GDT_user_code = GDT_user_base | SEG_code_xr
   private GDT_user_data = GDT_user_base | SEG_data_rw
-  private GDT_user_tss = seg_pres(1) | seg_size(1) | SEG_code_xa
+  private GDT_user_tss = seg_pres(1) | seg_priv(3) | SEG_code_xa
 end

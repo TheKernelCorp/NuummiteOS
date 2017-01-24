@@ -34,7 +34,7 @@ lib LibIDT
 end
 
 alias InterruptHandler = -> Nil
-alias ExceptionHandler = LibIDT::StackFrame -> Nil
+alias ExceptionHandler = StackFrame -> Nil
 
 module IDT
   extend self
@@ -47,7 +47,7 @@ module IDT
   def setup
     LibGlue.setup_idt
     {% for i in 0...ISR_COUNT %}
-      @@isrs[{{ i }}] = ->handle_exception(LibIDT::StackFrame)
+      @@isrs[{{ i }}] = ->handle_exception(StackFrame)
     {% end %}
     {% for i in 0...IRQ_COUNT %}
       @@irqs[{{ i }}] = ->{ nil }

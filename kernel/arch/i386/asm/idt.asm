@@ -31,6 +31,12 @@ idt_handle_isr:
     extern glue_handle_isr
     call glue_handle_isr
     mov esp, [active_stack] ; apply new stack
+; .usermode:
+;     mov ax, 0x23
+;     mov ds, ax
+;     mov es, ax
+;     mov fs, ax
+;     mov gs, ax
 .leave:
     pop gs
     pop fs

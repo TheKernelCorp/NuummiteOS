@@ -11,9 +11,9 @@ class NuumShell
 
   def run
     banner
-    until @login
-      login
-    end
+    # until @login
+    #   login
+    # end
     loop do
       prompt = "#{@user}@Nuummite:/# "
       line, command, args = read_command prompt
