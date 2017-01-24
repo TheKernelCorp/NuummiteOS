@@ -83,14 +83,18 @@ target = {
 }
 
 dirs = {
+    'conf': 'conf',
+    'build': 'build',
+    'sysroot': 'sysroot',
+    'sysroot:boot': 'sysroot/boot',
     'arch': 'kernel/arch/{}'.format(target['arch']),
     'asm': 'kernel/arch/{}/asm'.format(target['arch']),
     'src': 'kernel/src',
-    'iso': 'isodir',
-    'iso:boot': 'isodir/boot',
-    'iso:grub': 'isodir/boot/grub',
-    'iso:tree': 'isodir/boot/grub',
-    'grub': 'grub',
+    'iso': 'build/isodir',
+    'iso:boot': 'build/isodir/boot',
+    'iso:grub': 'build/isodir/boot/grub',
+    'iso:tree': 'build/isodir/boot/grub',
+    'grub': 'conf/grub',
 }
 
 files = {
@@ -105,12 +109,13 @@ files = {
     'dst': {
         'grub.cfg': os.path.join(dirs['iso:grub'], 'grub.cfg'),
         'kernel': os.path.join(dirs['iso:boot'], 'nuummite.kern'),
-        'iso': 'nuummite-{arch}.iso'.format(arch=target['arch']),
+        'iso': '{build}/nuummite-{arch}.iso'.format(build=dirs['build'], arch=target['arch']),
+        'boot:kernel': '{sysroot}/kernel.o'.format(sysroot=dirs['sysroot:boot']),
     },
 
     # Object files
     'obj': {
-        'kernel': 'nuummite-{arch}.o'.format(arch=target['arch']),
+        'kernel': '{build}/nuummite-{arch}.o'.format(build=dirs['build'], arch=target['arch']),
     },
 
 }
@@ -230,9 +235,13 @@ Requires(kernel, crystal)
 iso = env.Command(
     files['dst']['iso'],
     kernel, [
+        # Update grub configuration
         Copy(files['dst']['grub.cfg'], files['src']['grub.cfg']),
+        # Copy the kernel object to its destinations
         Copy(files['dst']['kernel'], files['obj']['kernel']),
-        BuildKernelImage
+        Copy(files['dst']['boot:kernel'], files['dst']['kernel']),
+        # Build the kernel image
+        BuildKernelImage,
     ]
 )
 
