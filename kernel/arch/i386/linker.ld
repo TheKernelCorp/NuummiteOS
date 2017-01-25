@@ -4,8 +4,8 @@ SECTIONS {
   . = 1M;
 
   .text BLOCK (4K) : ALIGN (4K) {
-    *(.multiboot)
-    *(.text)
+    KEEP(*(.multiboot))
+    *(.text .text.*)
     *(.glue)
   }
 

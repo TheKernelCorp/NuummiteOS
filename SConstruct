@@ -85,11 +85,13 @@ target = {
 dirs = {
     'conf': 'conf',
     'build': 'build',
+    'kernel': 'kernel',
+    'kernel:src': 'kernel/src',
+    'runtime': 'libkrt',
     'sysroot': 'sysroot',
     'sysroot:boot': 'sysroot/boot',
     'arch': 'kernel/arch/{}'.format(target['arch']),
     'asm': 'kernel/arch/{}/asm'.format(target['arch']),
-    'src': 'kernel/src',
     'iso': 'build/isodir',
     'iso:boot': 'build/isodir/boot',
     'iso:grub': 'build/isodir/boot/grub',
@@ -102,7 +104,7 @@ files = {
     # Source files
     'src': {
         'grub.cfg': os.path.join(dirs['grub'], 'grub.cfg'),
-        'kernel.cr': os.path.join(dirs['src'], 'kernel.cr'),
+        'kernel': os.path.join(dirs['kernel:src'], 'kernel.cr'),
     },
 
     # Destination files
@@ -121,7 +123,9 @@ files = {
 }
 
 # List of all objects
-objects = [ os.path.join(dirs['src'], 'kernel.o') ]
+objects = [
+    os.path.join(dirs['kernel:src'], 'kernel.o'),
+]
 
 #
 # SConstruct Environment
@@ -145,7 +149,8 @@ env['LDFLAGS'] = (
     ' -T{ldscript}'
     ' -ffreestanding'
     ' -nostdlib'
-    ' -n -lgcc'
+    ' -lgcc'
+    ' -Wl,--nmagic,--gc-sections'
 ).format(ldscript=os.path.join(dirs['arch'], 'linker.ld'))
 
 # Compiler
@@ -225,7 +230,7 @@ for f in asm_sources:
     objects.append(o[0])
 
 # Rule :: Compile kernel
-crystal = env.CrystalProgram(source=files['src']['kernel.cr'])
+crystal = env.CrystalProgram(source=files['src']['kernel'])
 
 # Rule :: Link objects
 kernel = env.Link(target=files['obj']['kernel'], source=objects)
