@@ -15,11 +15,9 @@ We're always looking for help with our [Projects][projects]!
 - Run `scons` to build
 - Run `scons --qemu-curses` to build and run qemu
 
-## Using the recovery shell
+## Running tests
 
-- Username is: `root`
-- Password is: `1234`
-- Commands can be listed using `help`
+Run `crystal spec kernel/runtime`
 
 ## Troubleshooting
 
