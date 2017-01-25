@@ -1,3 +1,5 @@
+require "../runtime/src/prelude"
+
 lib LibBootstrap
   @[Packed]
   struct EarlyInfo
