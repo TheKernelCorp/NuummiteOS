@@ -33,7 +33,7 @@ struct Int
 
   def %(other : Int)
     if other == 0
-      raise DivisionByZero.new
+      raise "Division by zero"
     elsif (self ^ other) >= 0
       self.unsafe_mod other
     else
@@ -44,7 +44,7 @@ struct Int
 
   def remainder(other : Int)
     if other == 0
-      raise DivisionByZero.new
+      raise "Division by zero"
     else
       unsafe_mod other
     end
@@ -72,7 +72,7 @@ struct Int
 
   def **(exponent : Int) : self
     if exponent < 0
-      raise ArgumentError.new "cannot raise an integer to a negative integer power"
+      raise "Cannot raise an integer to a negative integer power"
     end
     result = self.class.new 1
     k = self
@@ -188,11 +188,11 @@ struct Int
 
   private def check_div_argument(other)
     if other == 0
-      raise DivisionByZero.new
+      raise "Division by zero"
     end
     {% begin %}
       if self < 0 && self == {{@type}}::MIN && other == -1
-        raise ArgumentError.new "overflow: {{@type}}::MIN / -1"
+        raise "Overflow"
       end
     {% end %}
   end
