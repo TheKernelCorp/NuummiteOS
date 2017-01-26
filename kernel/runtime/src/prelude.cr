@@ -1,4 +1,5 @@
-require "./version"
+# Order-dependent list
+require "./lib/std"
 
 # Alpha-sorted list
 require "./lib/heap"
