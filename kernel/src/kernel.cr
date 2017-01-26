@@ -1,4 +1,5 @@
 require "../runtime/src/prelude"
+require "./lib/terminal"
 
 lib LibBootstrap
   @[Packed]
@@ -9,5 +10,6 @@ lib LibBootstrap
 end
 
 fun kmain(info : LibBootstrap::EarlyInfo)
+  puts "Hello, world!"
   asm("cli; hlt")
 end
