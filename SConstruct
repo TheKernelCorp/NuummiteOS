@@ -70,11 +70,18 @@ AddOption(
     ,const='curses'
 )
 
+AddOption(
+    '--test'
+    ,dest='test'
+    ,action='store_true'
+)
+
 #
 # Globals
 #
 
 qemu = GetOption('qemu')
+test = GetOption('test')
 
 target = {
     'arch': GetOption('arch'),
@@ -87,7 +94,7 @@ dirs = {
     'build': 'build',
     'kernel': 'kernel',
     'kernel:src': 'kernel/src',
-    'runtime': 'libkrt',
+    'runtime': 'kernel/runtime',
     'sysroot': 'sysroot',
     'sysroot:boot': 'sysroot/boot',
     'arch': 'kernel/arch/{}'.format(target['arch']),
@@ -208,6 +215,11 @@ def RunQEMU(*args, **kwargs):
         curses=('--curses' if qemu == 'curses' else ''))
     call(args, shell=True)
 
+# Command :: Run Tests
+def RunTests(*args, **kwargs):
+    args = 'crystal spec {runtime} -Dnostd'.format(runtime=dirs['runtime'])
+    call(args, shell=True)
+
 #
 # Build Preparation
 #
@@ -252,3 +264,6 @@ iso = env.Command(
 
 # Rule :: Run QEMU
 if qemu: env.Command('__qemu', iso, RunQEMU)
+
+# Rule :: Run tests
+env.Alias('test', env.Command('__test', None, RunTests))

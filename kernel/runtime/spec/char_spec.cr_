@@ -1,0 +1,111 @@
+require "./spec_helper"
+
+describe Char do
+  describe "upcase" do
+    assert { 'a'.upcase.should eq('A') }
+    assert { '1'.upcase.should eq('1') }
+  end
+
+  describe "downcase" do
+    assert { 'A'.downcase.should eq('a') }
+    assert { '1'.downcase.should eq('1') }
+  end
+
+  describe "succ" do
+    assert { 'a'.succ.should eq('b') }
+  end
+
+  describe "pred" do
+    assert { 'b'.pred.should eq('a') }
+  end
+
+  describe "+" do
+    assert { ('a' + 2).should eq('c') }
+  end
+
+  describe "-" do
+    assert { ('c' - 2).should eq('a') }
+  end
+
+  describe "ascii_uppercase?" do
+    assert { 'a'.ascii_uppercase?.should be_false }
+    assert { 'A'.ascii_uppercase?.should be_true }
+    assert { '1'.ascii_uppercase?.should be_false }
+    assert { ' '.ascii_uppercase?.should be_false }
+  end
+
+  describe "ascii_lowercase?" do
+    assert { 'a'.ascii_lowercase?.should be_true }
+    assert { 'A'.ascii_lowercase?.should be_false }
+    assert { '1'.ascii_lowercase?.should be_false }
+    assert { ' '.ascii_lowercase?.should be_false }
+  end
+
+  describe "ascii_letter?" do
+    assert { 'a'.ascii_letter?.should be_true }
+    assert { 'A'.ascii_letter?.should be_true }
+    assert { '1'.ascii_letter?.should be_false }
+    assert { ' '.ascii_letter?.should be_false }
+  end
+
+  describe "ascii_digit?" do
+    assert { '0'.ascii_digit?.should be_true }
+    assert { '9'.ascii_digit?.should be_true }
+    assert { 'a'.ascii_digit?.should be_false }
+  end
+
+  describe "ascii_whitespace?" do
+    [' ', '\t', '\n', '\v', '\f', '\r'].each do |char|
+      assert { char.ascii_whitespace?.should be_true }
+    end
+    assert { 'A'.ascii_whitespace?.should be_false }
+  end
+
+  it "does <=>" do
+    ('a' <=> 'b').should be < 0
+    ('a' <=> 'a').should eq(0)
+    ('b' <=> 'a').should be > 0
+  end
+
+  describe "+" do
+    it "does for both ascii" do
+      str = 'f' + "oo"
+      str.bytesize.should eq(3)
+      str.@length.should eq(3)
+      str.should eq("foo")
+    end
+  end
+
+  describe "bytesize" do
+    it "does for ascii" do
+      'a'.bytesize.should eq(1)
+    end
+  end
+
+  it "does each_byte" do
+    'a'.each_byte(&.should eq('a'.ord)).should be_nil
+  end
+
+  it "#===(:Int)" do
+    ('c'.ord).should eq(99)
+    ('c' === 99_u8).should be_true
+    ('c' === 99).should be_true
+    ('z' === 99).should be_false
+  end
+
+  it "does ascii_control?" do
+    'x'.ascii_control?.should be_false
+    'a'.ascii_control?.should be_false
+    '\u0019'.ascii_control?.should be_true
+  end
+
+  it "does ascii?" do
+    'a'.ascii?.should be_true
+    127.chr.ascii?.should be_true
+    128.chr.ascii?.should be_false
+  end
+
+  describe "clone" do
+    assert { 'a'.clone.should eq('a') }
+  end
+end

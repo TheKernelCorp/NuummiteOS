@@ -1,6 +1,6 @@
 struct Char
   ZERO = '\0'
-  MAX_CODEPOINT = 0x10FFFF
+  MAX_CODEPOINT = 127
   MAX = MAX_CODEPOINT.unsafe_chr
 
   def -(other : Char)
@@ -33,6 +33,10 @@ struct Char
 
   def ascii_uppercase?
     'A' <= self <= 'Z'
+  end
+
+  def ascii_digit?
+    '0' <= self <= '9'
   end
 
   def ascii_letter?

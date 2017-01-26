@@ -1,5 +1,7 @@
 # Order-dependent list
-require "./lib/std"
+{% if !flag?(:nostd) %}
+  require "./lib/std"
+{% end %}
 require "./lib/libk"
 
 # Alpha-sorted list
