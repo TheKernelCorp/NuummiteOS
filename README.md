@@ -13,20 +13,17 @@ We're always looking for help with our [Projects][projects]!
 - Install the [latest Crystal compiler][crystal_compiler]
 - Install the [latest version of SCons][scons]
 - Run `scons` to build
+- Run `scons test` to run Runtime tests.
 - Run `scons --qemu-curses` to build and run qemu
-
-## Running tests
-
-Run `crystal spec kernel/runtime`
 
 ## Troubleshooting
 
 **`xorriso : FAILURE : Cannot find path '/efi.img' in loaded ISO image`** `or`   
 **`grub-mkrescue: error: ``mformat`` invocation failed`**:
 
-* On Arch: `sudo pacman -Sy mtools`
-* On Debian/Ubuntu/WSL: `sudo apt-get install mtools`
-* On Fedora/RedHat/CentOS: `sudo yum install mtools`
+- On Arch: `sudo pacman -Sy mtools`
+- On Debian/Ubuntu/WSL: `sudo apt-get install mtools`
+- On Fedora/RedHat/CentOS: `sudo yum install mtools`
 
 [cross_cc]: http://wiki.osdev.org/GCC_Cross-Compiler
 [crystal_home]: https://crystal-lang.org
