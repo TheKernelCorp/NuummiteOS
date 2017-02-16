@@ -63,7 +63,7 @@ module Heap
   #
   # If no limit is supplied, the amount of allocatable memory
   # will only be limited by the platform integer width.
-  def init(maddr : USize, limit : USize = 0)
+  def init(maddr : USize, limit : USize = USize.new(0))
     @@maddr = maddr
     if limit == 0
       @@limit = (USize.new(1) << (sizeof(USize) * 8)) - 1 
