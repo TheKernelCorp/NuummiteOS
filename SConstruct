@@ -198,7 +198,7 @@ def ValidateArchitecture(*args, **kwargs):
 def BuildKernelImage(target, source, env):
     args = [
         'grub-mkrescue'
-        ,'-o{iso}'.format(iso=files['dst']['iso'])
+        ,'--output={iso}'.format(iso=files['dst']['iso'])
         ,'{isodir}'.format(isodir=dirs['iso'])
     ]
     retc = check_call(args)
@@ -228,6 +228,7 @@ if not env.GetOption('clean'):
     Execute([
         ValidateArchitecture,
         Mkdir(dirs['iso:tree']),
+        Mkdir(dirs['sysroot:boot']),
     ])
 
 #
